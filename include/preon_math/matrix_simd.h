@@ -1,0 +1,81 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
+#pragma once
+#ifndef PREONMATH_MATRIX_SIMD_H
+#define PREONMATH_MATRIX_SIMD_H
+
+#include "compile_helper.h"
+
+#include "matrix.h"
+#include "vec_simd.h"
+
+#ifdef PREONMATH_COMPILER_MSVC
+#include <intrin.h>
+#else
+#include <x86intrin.h>
+#endif
+
+namespace Preon
+{
+    namespace Math
+    {
+        template<size_t M, size_t N, typename T = float>
+        using matrix_simd = matrix<M, N, typename Simd::Register<T>::type>;
+
+        namespace Simd
+        {
+            template <size_t M, size_t N, typename T>
+            PREONMATH_FORCEINLINE void setValues(matrix_simd<M, N, T>* out, const matrix<M, N, T>& m0, const matrix<M, N, T>& m1, const matrix<M, N, T>& m2, const matrix<M, N, T>& m3)
+            {
+                for (size_t c = 0; c < N; c++)
+                    setVecs(&out->column(c), m0.column(c), m1.column(c), m2.column(c), m3.column(c));
+            }
+
+            template <size_t M, size_t N, typename T, class Getter>
+            PREONMATH_FORCEINLINE void setValues(matrix_simd<M, N, T>* out, const Getter& func)
+            {
+                setValues(out, func(0), func(1), func(2), func(3));
+            }
+
+            template <size_t M, size_t N, typename T, class Getter>
+            PREONMATH_FORCEINLINE void setValues(matrix_simd<M, N, T>* out, const Getter& func, uint numElements, const matrix<M, N, T>& fillValue)
+            {
+                setValues(out,
+                          func(0),
+                          (numElements > 1) ? func(1) : fillValue,
+                          (numElements > 2) ? func(2) : fillValue,
+                          (numElements > 3) ? func(3) : fillValue);
+            }
+
+            template <size_t M, size_t N, typename T>
+            PREONMATH_FORCEINLINE matrix<M, N, T> hSum(const matrix_simd<M, N, T>& m)
+            {
+                matrix<M, N, T> out;
+                for (size_t c = 0; c < N; c++)
+                    for (size_t r = 0; r < M; r++)
+                        out(r, c) = hSum(m(r, c));
+                return out;
+            }
+            // We have the following two methods so that we do not need to provide the
+            // template parameters when using hSum for matrices since for automatic
+            // template deducation, the function template arguments must be exactly
+            // the same as the ones from the given matrix class. This is not the case
+            // for the function above since it takes non-simd and the matrix has simd
+            //  as last template argument.
+            template <size_t M, size_t N>
+            PREONMATH_FORCEINLINE matrix<M, N, float> hSum(const matrix<M, N, float_simd>& m)
+            {
+                return hSum<M, N, float>(m);
+            }
+            template <size_t M, size_t N>
+            PREONMATH_FORCEINLINE matrix<M, N, double> hSum(const matrix<M, N, double_simd>& m)
+            {
+                return hSum<M, N, double>(m);
+            }
+        }  // namespace Simd
+    }  // namespace Math
+}  // namespace Preon
+
+#endif  // PREONMATH_MATRIX_SIMD_H
