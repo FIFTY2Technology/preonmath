@@ -4,12 +4,17 @@ Preon::Math is a simple C++ math library that is used for all the basic math ope
 
 Preon::Math is tested to compile with Visual Studio 2015 and GCC 7.
 
+## Changes
+### 0.02 - 02.20.2020
+- Renamed `vec::zeroVector()` to `vec::zero()`
+- Improved `double`-precision support (new cast methods in `Preon::Math::cast`, new templated operators).
+
 ## Roadmap
 * [ ] Port remaining unit tests from QTest to catch2.
 * [ ] Doxygen documentation.
 * [ ] CI builds.
 * [ ] Extend unit tests to cover all classes and methods.
-* [ ] Rename `vec::zeroVector()` to `vec::zero()` to match the `matrix::zero()` method.
+* [x] Rename `vec::zeroVector()` to `vec::zero()` to match the `matrix::zero()` method.
 * [ ] Add a `all.h` (or similar name) that includes all math classes/defines. Similar, `all_fwd.h` would be nice.
 * [ ] Combine `math_misc.h` and `math_utils.h`.
 * [ ] Compare `MatrixUtil::fromQuaternion` to `RotationUtils::matrixFromQuaternions` and decide on one variant. Delete the other.
