@@ -87,17 +87,25 @@ namespace Preon
                 return conjugate() / length();
             }
 
-            vec<3, Real> rotatedVector(const vec<3, Real>& vector) const
+            template <typename T_Out, typename T_Vec>
+            vec<3, T_Out> rotatedVector(const vec<3, T_Vec>& vector) const
             {
-                return (*this * quat<Real>(0, vector) * conjugate()).toVector3();
+                return operator*<T_Out, T_Out, Real>(operator*<T_Out, Real, T_Vec>(*this, quat<T_Vec>(0, vector)), conjugate()).toVector3();
             }
 
+            vec<3, Real> rotatedVector(const vec<3, Real>& vector) const
+            {
+                return rotatedVector<Real, Real>(vector);
+            }
+
+
             //! Returns the quaternion that transformed the direction from into the direction to. Both from and to must be normalized directions.
-            static quat<Real> rotationBetween_nothrow(const vec<3, Real>& from, const vec<3, Real>& to, double minCrossProductLength = 0.0001)
+            template <typename T_Vec>
+            static quat<Real> rotationBetween_nothrow(const vec<3, Real>& from, const vec<3, T_Vec>& to, double minCrossProductLength = 0.0001)
             {
                 // the only purpose of this clamping is to deal with Realing point rounding errors. We expect that from and to are normalized.
-                Real angle = std::acos(MathUtils::clamp(vec<3, Real>::dotProduct(from, to), Real{-1}, Real{1}));
-                vec<3, Real> axis = vec<3, Real>::crossProduct(from, to);
+                Real angle = std::acos(MathUtils::clamp(vec<3, Real>::template dotProduct<Real, Real, T_Vec>(from, to), Real{-1}, Real{1}));
+                vec<3, Real> axis = vec<3, Real>::template crossProduct<Real, T_Vec>(from, to);
                 Real length = axis.length();
                 if (length > minCrossProductLength)
                 {
@@ -112,26 +120,13 @@ namespace Preon
             }
 
             //! Returns the quaternion that transformed the direction from into the direction to. Both from and to must be normalized directions.
-            static quat<Real> rotationBetween(const vec<3, Real>& from, const vec<3, Real>& to, double minCrossProductLength = 0.0001)
+            template <typename T_in = Real>
+            static quat<Real> rotationBetween(const vec<3, Real>& from, const vec<3, T_in>& to, double minCrossProductLength = 0.0001)
             {
                 THROW_EXCEPTION(!AreEqual(Real(1), from.lengthSquared()), "from is not normalized!")
-                THROW_EXCEPTION(!AreEqual(Real(1), to.lengthSquared()), "to is not normalized!")
+                THROW_EXCEPTION(!AreEqual(T_in(1), to.lengthSquared()), "to is not normalized!")
 
                 return rotationBetween_nothrow(from, to, minCrossProductLength);
-            }
-
-            static quat<Real> product(const quat<Real>& q, const quat<Real>& p)
-            {
-                quat<Real> result;
-                //w = q1p1 - q2p2 - q3p3 - q4p4
-                result.setScalar(q.scalar()*p.scalar() - q.x()*p.x() - q.y()*p.y() - q.z()*p.z());
-                //x = q2p1 - q1p2 - q4p3 - q3p4
-                result.setX(q.x()*p.scalar() - q.scalar()*p.x() - q.z()*p.y() - q.y()*p.z());
-                //y = q3p1 - q4p2 - q1p3 - q2p4
-                result.setY(q.y()*p.scalar() - q.z()*p.x() - q.scalar()*p.y() - q.x()*p.z());
-                //Z = q4p1 - q3p2 - q2p3 - q1p4
-                result.setZ(q.z()*p.scalar() - q.y()*p.x() - q.x()*p.y() - q.scalar()*p.z());
-                return result;
             }
 
             quat<Real>& operator+=(const quat<Real>& quat)
@@ -158,14 +153,6 @@ namespace Preon
                 m_W *= factor;
                 return *this;
             }
-            quat<Real>& operator*=(const quat<Real>& quat)
-            {
-                m_X *= quat.m_X;
-                m_Y *= quat.m_Y;
-                m_Z *= quat.m_Z;
-                m_W *= quat.m_W;
-                return *this;
-            }
             quat<Real>& operator/=(Real divisor)
             {
                 m_X /= divisor;
@@ -185,14 +172,14 @@ namespace Preon
                 // See http://www.j3d.org/matrix_faq/matrfaq_latest.html#Q56
                 // We normalize the result just in case the values are close
                 // to zero, as suggested in the above FAQ.
-                vec<3, Real> axisNormlized = axis.pseudoNormalized();
+                vec<3, Real> axisNormalized = axis.pseudoNormalized();
                 Real a = angle / 2;
                 Real s = std::sin(a);
                 Real c = std::cos(a);
                 return quat<Real>(c,
-                                  axisNormlized[0] * s,
-                                  axisNormlized[1] * s,
-                                  axisNormlized[2] * s).normalized();
+                                  axisNormalized[0] * s,
+                                  axisNormalized[1] * s,
+                                  axisNormalized[2] * s).normalized();
             }
 
             void toAxisAndAngle(vec<3, Real>* axis, Real* angle)
@@ -288,21 +275,20 @@ namespace Preon
         typedef quat<float> quatf;
         typedef quat<double> quatd;
 
+
+        template <typename Out, typename In1, typename In2>
+        static quat<Out> operator*(const quat<In1>& q, const quat<In2>& p)
+        {
+            return quat<Out>(q.scalar() * p.scalar() - q.x() * p.x()      - q.y() * p.y()      - q.z() * p.z(),
+                             q.scalar() * p.x()      + q.x() * p.scalar() + q.y() * p.z()      - q.z() * p.y(),
+                             q.scalar() * p.y()      - q.x() * p.z()      + q.y() * p.scalar() + q.z() * p.x(),
+                             q.scalar() * p.z()      + q.x() * p.y()      - q.y() * p.x()      + q.z() * p.scalar());
+        }
+
         template<typename Real>
         inline const quat<Real> operator*(const quat<Real>& q1, const quat<Real>& q2)
         {
-            Real ww = (q1.z() + q1.x()) * (q2.x() + q2.y());
-            Real yy = (q1.scalar() - q1.y()) * (q2.scalar() + q2.z());
-            Real zz = (q1.scalar() + q1.y()) * (q2.scalar() - q2.z());
-            Real xx = ww + yy + zz;
-            Real qq = 0.5 * (xx + (q1.z() - q1.x()) * (q2.x() - q2.y()));
-
-            Real w = qq - ww + (q1.z() - q1.y()) * (q2.y() - q2.z());
-            Real x = qq - xx + (q1.x() + q1.scalar()) * (q2.x() + q2.scalar());
-            Real y = qq - yy + (q1.scalar() - q1.x()) * (q2.y() + q2.z());
-            Real z = qq - zz + (q1.z() + q1.y()) * (q2.scalar() - q2.x());
-
-            return quat<Real>(w, x, y, z);
+            return operator*<Real, Real, Real>(q1, q2);
         }
 
         template<typename Real>
@@ -417,8 +403,10 @@ inline bool qFuzzyCompare(const Preon::Math::quat<Real>& q1, const Preon::Math::
 }
 
 Q_DECLARE_TYPEINFO(quatf, Q_MOVABLE_TYPE);
-Q_DECLARE_METATYPE(quatf)
 Q_DECLARE_TYPEINFO(quatd, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(quatf)
+Q_DECLARE_METATYPE(quatd)
+
 #endif  // PREONMATH_QT_INTEGRATION
 
 #endif  // PREONMATH_QUAT_H

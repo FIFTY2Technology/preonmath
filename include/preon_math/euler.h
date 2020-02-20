@@ -94,7 +94,10 @@ inline bool qFuzzyCompare(const euler<T>& e1, const euler<T>& e2)
 {
     return qFuzzyCompare(e1.m_Data, e2.m_Data);
 }
+
 Q_DECLARE_METATYPE(eulerf)
+Q_DECLARE_METATYPE(eulerd)
+
 #endif  // PREONMATH_QT_INTEGRATION
 
 #endif  // PREONMATH_EULER_H

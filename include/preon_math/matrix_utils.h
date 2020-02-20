@@ -17,7 +17,7 @@ namespace Preon
 {
     namespace Math
     {
-        namespace MatrixUtil
+        namespace MatrixUtils
         {
             //! Creates a matrix that ---used as matrix-vector multiplication---
             //! expresses the a cross product.
@@ -559,7 +559,7 @@ namespace Preon
             {
                 // Compute scale.
                 vec3f scale(transform.column(0).length(), transform.column(1).length(), transform.column(2).length());
-                matrix33f rot;
+                matrix<3, 3, Scalar> rot;
                 for (size_t i = 0; i < 3; i++)
                     for (size_t j = 0; j < 3; j++)
                         rot(i, j) = IsZero(scale[i]) ? transform(i,j) : transform(i,j) / scale[i];
@@ -567,14 +567,22 @@ namespace Preon
             }
         }  // namespace MatrixUtil
 
+
+        template <typename OutV, typename InM, typename InV>
+        inline vec<3, OutV> operator*(const matrix<4, 4, InM>& m, const vec<3, InV>& v)
+        {
+            vec<4, InV> v4(v[0], v[1], v[2], 1.0);
+            v4 = operator*<InV>(m, v4);
+            // THROW_EXCEPTION(!AreEqual(v4[3], static_cast<T>(1.0)), "matrix44 * vec3 results in non-normalized vec3.");
+            return (1 / v4[3]) * vec<3, OutV>(v4[0], v4[1], v4[2]);
+        }
+
         template <typename T>
         inline vec<3, T> operator*(const matrix<4, 4, T>& m, const vec<3, T>& v)
         {
-            vec<4, T> v4(v[0], v[1], v[2], 1.0);
-            v4 = m * v4;
-            // THROW_EXCEPTION(!AreEqual(v4[3], static_cast<T>(1.0)), "matrix44 * vec3 results in non-normalized vec3.");
-            return (1 / v4[3]) * vec<3, T>(v4[0], v4[1], v4[2]);
+            return operator*<T, T, T>(m, v);
         }
+
     }  // namespace Math
 }  // namespace Preon
 

@@ -7,6 +7,7 @@ add_library(preon_math INTERFACE)
 set(header_files
         ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/compile_helper.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/basics.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/cast.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/euler.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/euler_fwd.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/math_misc.h
@@ -18,7 +19,7 @@ set(header_files
         ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/matrix44.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/matrix_fwd.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/matrix_simd.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/matrix_util.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/matrix_utils.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/quat.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/quat_fwd.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/preon_math/rotation_utils.h

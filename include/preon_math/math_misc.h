@@ -140,10 +140,10 @@ namespace Preon
                 return val * val;
             }
 
-            template<class T>
-            static T linearInterpolation(const T& val1, const T& val2, float weight)
+            template<class T, class W_t>
+            static T linearInterpolation(const T& val1, const T& val2, W_t weight)
             {
-                return val1 * weight + val2 * (1.0f - weight);
+                return val1 * weight + val2 * (1.0 - weight);
             }
 
             /// Performs trilinear interpolation.

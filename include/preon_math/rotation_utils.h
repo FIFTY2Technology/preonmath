@@ -149,7 +149,7 @@ namespace Preon
             {
                 //If Euler angles are the same, angular velocity must be zero
                 if (e1 == e2)
-                    return vec3d::zeroVector();
+                    return vec3d::zero();
                 return angularVelocityViaRotationMatrix(matrixFromEulerAngle(e1), matrixFromEulerAngle(e2), dt);
             }
         }

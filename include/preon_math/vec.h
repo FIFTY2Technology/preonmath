@@ -37,6 +37,9 @@ namespace Preon
         {
             template <typename T, typename U>
             using enable_if_not_convertible = typename std::enable_if<!std::is_convertible<T, U>::value>::type*;
+
+            template <typename T>
+            using enable_if_scalar = std::enable_if_t<std::is_arithmetic<T>::value || is_simd_scalar<T>::value>;
         }
 
         // Replace with std::isgreater when we use c++14.
@@ -180,7 +183,7 @@ namespace Preon
 
             /** Static predefined vectors **/
 
-            static vec<D, T> zeroVector() { vec<D, T> v; v.setZero(); return v; }
+            static vec<D, T> zero() { vec<D, T> v; v.setZero(); return v; }
 
             /** Length **/
 
@@ -197,9 +200,9 @@ namespace Preon
                 T length = this->length();
             #ifdef DEPLOY_MODE
                 if (IsZero(length))
-                    *this = zeroVector();
+                    *this = zero();
             #else
-                THROW_EXCEPTION(IsZero(length), std::domain_error("Normalizing a zero vector is undefined"));
+                THROW_EXCEPTION(IsZero(length), std::domain_error("Normalizing a zero vector is undefined"))
             #endif
                 (*this) /= length;
             }
@@ -271,11 +274,17 @@ namespace Preon
                 return vec<D, T>([&] (size_t d) { return (*this)[d] / divisor[d]; } );
             }
 
-            static PREONMATH_FORCEINLINE T dotProduct(const vec<D, T>& v1, const vec<D, T>& v2)
+            template <typename T_Out = T, typename T_Vec1, typename T_Vec2>
+            static PREONMATH_FORCEINLINE T_Out dotProduct(const vec<D, T_Vec1>& v1, const vec<D, T_Vec2>& v2)
             {
-                T out = v1[0] * v2[0];
+                T_Out out = v1[0] * v2[0];
                 StaticFor<1, D>([&] (size_t d) { out = out + (v1[d] * v2[d]); });
                 return out;
+            }
+
+            static PREONMATH_FORCEINLINE T dotProduct(const vec<D, T>& v1, const vec<D, T>& v2)
+            {
+                return dotProduct<T, T, T>(v1, v2);
             }
 
 
@@ -284,9 +293,15 @@ namespace Preon
             template <size_t E = D>
             static typename std::enable_if<E == 3, vec<D, T>>::type crossProduct(const vec<D, T>& v1, const vec<D, T>& v2)
             {
-                return vec<D, T>(v1.y() * v2.z() - v1.z() * v2.y(),
-                                 v1.z() * v2.x() - v1.x() * v2.z(),
-                                 v1.x() * v2.y() - v1.y() * v2.x());
+                return crossProduct<T, T, D>(v1, v2);
+            }
+
+            template <typename Out, typename In, size_t E = D>
+            static typename std::enable_if<E == 3, vec<D, T>>::type crossProduct(const vec<D, T>& v1, const vec<D, In>& v2)
+            {
+                return vec<D, Out>(v1.y() * v2.z() - v1.z() * v2.y(),
+                                   v1.z() * v2.x() - v1.x() * v2.z(),
+                                   v1.x() * v2.y() - v1.y() * v2.x());
             }
 
 
@@ -470,13 +485,13 @@ namespace Preon
         template <size_t D, typename T>
         bool operator!=(const vec_if_non_simd<D, T>& v1, const vec<D, T>& v2) { return !(v1 == v2); }
 
-        template<size_t D, typename T, typename F>
+        template<size_t D, typename T, typename F, typename = enable_if_scalar<F>>
         vec<D, T> operator*(const F scalar, const vec<D, T>& v)
         {
             return vec<D, T>([&] (size_t d) { return scalar * v[d]; });
         }
 
-        template<size_t D, typename T, typename F>
+        template<size_t D, typename T, typename F, typename = enable_if_scalar<F>>
         vec<D, T> operator*(const vec<D, T>& v, const F scalar)
         {
             return scalar * v;
@@ -500,10 +515,16 @@ namespace Preon
             return vec<D, T>([&] (size_t d) { return v1[d] - v2[d]; });
         }
 
+        template<size_t D, typename T_Out, typename T_Vec1, typename T_Vec2>
+        T_Out operator*(const vec<D, T_Vec1>& v1, const vec<D, T_Vec2>& v2)
+        {
+            return vec<D, T_Out>::template dotProduct<T_Out, T_Vec1, T_Vec2>(v1, v2);
+        }
+
         template<size_t D, typename T>
         T operator*(const vec<D, T>& v1, const vec<D, T>& v2)
         {
-            return vec<D, T>::dotProduct(v1, v2);
+            return operator*<D, T, T, T>(v1, v2);
         }
 
         template<size_t D, typename T>

@@ -359,28 +359,34 @@ matrix<M, N, T>& matrix<M, N, T>::operator*=(T factor)
 template <size_t M, size_t N, size_t O, typename T>
 matrix<M, O, T> operator*(const matrix<M, N, T>& m1, const matrix<N, O, T>& m2)
 {
-    matrix<M, O, T> mResult;
-    for (size_t r = 0; r < M; r++)
-        for (size_t c = 0; c < O; c++)
-        {
-            // We manually compute the dot product of m1.row(r) and m2.column(c)
-            // since calling m1.row(r) would copy the data due to data layout.
-            mResult(r, c) = m1(r, 0) * m2(0, c);
-            for (size_t n = 1; n < N; ++n)
-                mResult(r, c) += m1(r, n) * m2(n, c);
-        }
-    return mResult;
+    return matrix<M, O, T>( [&](size_t r, size_t c)
+    {
+        return m1.template rowVecProduct<T>(r, m2.column(c));
+    });}
+
+template <typename T, size_t M, size_t N, typename T_Mat, typename T_Vec>
+vec<M, T> operator*(const matrix<M, N, T_Mat>& m, const vec<N, T_Vec>& v)
+{
+    return vec<M, T>([&](size_t r)
+    {
+        return m.template rowVecProduct<T, T_Vec>(r, v);
+    });
 }
+
+
+// Helpers
 
 template <size_t M, size_t N, typename T>
-vec<M, T> operator*(const matrix<M, N, T>& m, const vec<N, T>& v)
+template <typename T_Out, typename T_Vec>
+T_Out matrix<M, N, T>::rowVecProduct(size_t r, const vec<N, T_Vec>& vec) const
 {
-    vec<M, T> result;
-    for (size_t r = 0; r < M; ++r)
-        result[r] = m.row(r) * v;
-    return result;
+    // We manually compute the dot product of this->row(r) and vec,
+    // since calling this->row(r) would copy the data due to data layout.
+    T_Out prod = element(r, 0) * vec[0];
+    for (size_t c = 1; c < N; ++c)
+        prod += element(r, c) * vec[c];
+    return prod;
 }
-
 
 
 // Overloaded non-member operators

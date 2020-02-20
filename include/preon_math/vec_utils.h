@@ -14,9 +14,8 @@ namespace Preon
 {
     namespace Math
     {
-        class VecUtils
+        namespace VecUtils
         {
-        public:
             template <size_t D, typename T>
             static vec<D, T> round(vec<D, T> v)
             {
@@ -39,15 +38,6 @@ namespace Preon
                 for (size_t i = 0; i < D; i++)
                     v[i] = std::ceil(v[i]);
                 return v;
-            }
-
-            template<typename TOut, typename TIn, size_t D>
-            static vec<D, TOut> cast(const vec<D, TIn>& v)
-            {
-                vec<D, TOut> out;
-                for (size_t i = 0; i < D; i++)
-                    out[i] = static_cast<TOut>(v[i]);
-                return out;
             }
 
             template <size_t D, typename T>

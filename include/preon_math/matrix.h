@@ -106,6 +106,9 @@ namespace Preon
             inline matrix<M, N, T>& operator*=(T factor);
             inline matrix<M, N, T>& operator/=(T divisor) { *this *= (Simd::scalar_cast<float, T>(1) / divisor); return *this; }
 
+            // Helpers
+            template <typename T_Out, typename T_Vec> inline T_Out rowVecProduct(size_t row, const vec<N, T_Vec>& vec) const;
+
         #ifdef PREONMATH_QT_INTEGRATION
             template<typename E = T>
             QString toUtf8(enable_if_non_simd<E, void*> = nullptr) const
@@ -161,8 +164,10 @@ namespace Preon
         template <size_t M, size_t N, typename T>
         inline matrix<M, N, T> operator*(matrix<M, N, T> m, const T factor) { return factor * m; }
 
+        template <typename T, size_t M, size_t N, typename T_Mat, typename T_Vec>
+        inline vec<M, T> operator*(const matrix<M, N, T_Mat>& m, const vec<N, T_Vec>& v);
         template <size_t M, size_t N, typename T>
-        inline vec<M, T> operator*(const matrix<M, N, T>& m, const vec<N, T>& v);
+        inline vec<M, T> operator*(const matrix<M, N, T>& m, const vec<N, T>& v) { return operator*<T, M, N, T, T>(m, v); }
 
         template <size_t M, size_t N, typename T>
         inline matrix<M, N, T> operator/(matrix<M, N, T> m, const T factor) { return m /= factor; }
