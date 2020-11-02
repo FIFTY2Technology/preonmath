@@ -3,8 +3,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 #pragma once
-#ifndef PREONMATH_MATRIX_FWD_H
-#define PREONMATH_MATRIX_FWD_H
 
 #include "compile_helper.h"
 #include "scalar_simd.h"
@@ -13,18 +11,17 @@
 
 namespace Preon
 {
-    namespace Math
-    {
-        template <std::size_t M, std::size_t N, typename T> class matrix;
-        // Matrix 3x3
-        typedef matrix<3, 3, float> matrix33f;
-        typedef matrix<3, 3, double> matrix33d;
-        typedef matrix<3, 3, float_simd> matrix33_Simd;
+namespace Math
+{
+    template<std::size_t M, std::size_t N, typename T>
+    class matrix;
+    // Matrix 3x3
+    typedef matrix<3, 3, float> matrix33f;
+    typedef matrix<3, 3, double> matrix33d;
+    typedef matrix<3, 3, float_simd> matrix33_Simd;
 
-        // Matrix 4x4
-        typedef matrix<4, 4, float> matrix44f;
-        typedef matrix<4, 4, double> matrix44d;
-    }  // namespace Math
+    // Matrix 4x4
+    typedef matrix<4, 4, float> matrix44f;
+    typedef matrix<4, 4, double> matrix44d;
+}  // namespace Math
 }  // namespace Preon
-
-#endif  // PREONMATH_MATRIX_FWD_H

@@ -3,8 +3,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 #pragma once
-#ifndef PREONMATH_VEC4_H
-#define PREONMATH_VEC4_H
 
 #include "compile_helper.h"
 
@@ -12,13 +10,13 @@
 
 namespace Preon
 {
-    namespace Math
-    {
-        // Vec4.
-        typedef vec<4, float> vec4f;
-        typedef vec<4, double> vec4d;
-        typedef vec<4, int> vec4i;
-    }  // namespace Math
+namespace Math
+{
+    // Vec4.
+    typedef vec<4, float> vec4f;
+    typedef vec<4, double> vec4d;
+    typedef vec<4, int> vec4i;
+}  // namespace Math
 }  // namespace Preon
 
 #ifdef PREONMATH_QT_INTEGRATION
@@ -28,5 +26,3 @@ Q_DECLARE_TYPEINFO(vec4i, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(vec4f)
 Q_DECLARE_METATYPE(vec4d)
 #endif  // PREONMATH_QT_INTEGRATION
-
-#endif  // PREONMATH_VEC4_H

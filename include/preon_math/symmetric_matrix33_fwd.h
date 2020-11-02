@@ -10,9 +10,10 @@ namespace Preon
 {
 namespace Math
 {
-    template<typename Real>
-    class quat;
-    typedef quat<float> quatf;
-    typedef quat<double> quatd;
+    template<typename T>
+    class SymmetricMatrix33;
+
+    typedef SymmetricMatrix33<float> SymmetricMatrix33f;
+    typedef SymmetricMatrix33<double> SymmetricMatrix33d;
 }  // namespace Math
 }  // namespace Preon

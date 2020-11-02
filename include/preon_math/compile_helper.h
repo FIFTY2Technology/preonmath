@@ -3,11 +3,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 #pragma once
-#ifndef PREONMATH_COMPILE_HELPER_H
-#define PREONMATH_COMPILE_HELPER_H
 
-//#define PREONMATH_USED_IN_PREON_CODE
-//#define PREONMATH_QT_INTEGRATION
+// #define PREONMATH_USED_IN_PREON_CODE
+// #define PREONMATH_QT_INTEGRATION
 
 // This is something from the preon code. We will try to get rid of it in the preon math code in the future.
 // Includes or defines macros etc depending on if the library is used
@@ -15,22 +13,28 @@
 #ifdef PREONMATH_USED_IN_PREON_CODE
     #include "core/utility/error_handling.h"
 
-    // Needed for the "using" below.
-    namespace Preon
-    {
-        namespace Math
-        {
-        }  // namespace Math
-    }  // namespace Preon
-    using namespace Preon::Math;
+// Needed for the "using" below.
+namespace Preon
+{
+namespace Math
+{
+}  // namespace Math
+}  // namespace Preon
+using namespace Preon::Math;
 #endif  // PREONMATH_USED_IN_PREON_CODE
 #ifndef THROW_EXCEPTION
-    #define THROW_EXCEPTION(condition, exception) { if (condition) { throw exception; } }
+    #define THROW_EXCEPTION(condition, exception) \
+        {                                         \
+            if (condition)                        \
+            {                                     \
+                throw exception;                  \
+            }                                     \
+        }
 #endif  // THROW_EXCEPTION
 
 // Define macros for identifying msvc compiler.
 // See https://blog.kowalczyk.info/article/j/guide-to-predefined-macros-in-c-compilers-gcc-clang-msvc-etc..html
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
     #define PREONMATH_COMPILER_MSVC
 #endif
 
@@ -53,5 +57,3 @@
 #ifdef PREONMATH_QT_INTEGRATION
     #include <QtGlobal>
 #endif  // PREONMATH_QT_INTEGRATION
-
-#endif  // PREONMATH_COMPILE_HELPER_H

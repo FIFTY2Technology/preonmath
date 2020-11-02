@@ -3,8 +3,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 #pragma once
-#ifndef PREONMATH_MATRIX22_H
-#define PREONMATH_MATRIX22_H
 
 #include "compile_helper.h"
 
@@ -13,13 +11,13 @@
 
 namespace Preon
 {
-    namespace Math
-    {
-        // Matrix 2x2
-        typedef matrix<2, 2, float> matrix22f;
-        typedef matrix<2, 2, double> matrix22d;
-        typedef matrix<2, 2, float_simd> matrix22_Simd;
-    }  // namespace Math
+namespace Math
+{
+    // Matrix 2x2
+    typedef matrix<2, 2, float> matrix22f;
+    typedef matrix<2, 2, double> matrix22d;
+    typedef matrix<2, 2, float_simd> matrix22_Simd;
+}  // namespace Math
 }  // namespace Preon
 
 #ifdef PREONMATH_QT_INTEGRATION
@@ -29,5 +27,3 @@ Q_DECLARE_TYPEINFO(matrix22d, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(matrix22f)
 Q_DECLARE_METATYPE(matrix22d)
 #endif  // PREONMATH_QT_INTEGRATION
-
-#endif  // PREONMATH_MATRIX22_H

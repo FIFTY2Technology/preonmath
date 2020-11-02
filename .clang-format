@@ -1,0 +1,224 @@
+---
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+Language:        Cpp
+# BasedOnStyle:  WebKit
+
+AccessModifierOffset: -4
+#public: <- intended by 4 to left
+#    enum NodeState
+
+# Align parameters on the open bracket:
+#someLongFunction(argument1,
+#                 argument2);
+AlignAfterOpenBracket: Align
+
+# Humans are mostly too lazy for those but they can look nice
+AlignConsecutiveMacros: false
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: Right
+AlignOperands: false
+AlignTrailingComments: false
+
+# True always allows all.
+AllowAllArgumentsOnNextLine: true
+AllowAllConstructorInitializersOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortBlocksOnASingleLine: Empty # no effect
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortLambdasOnASingleLine: All
+# AllowShortEnumsOnASingleLine: true # clang-11
+AllowShortFunctionsOnASingleLine : Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: false
+BinPackParameters: false
+
+# Following setup mimics allman style.
+BreakBeforeBraces: Custom
+BraceWrapping: # only active for BreakBeforeBraces Custom
+  AfterCaseLabel:  true
+  AfterClass:      true
+  AfterControlStatement: true
+  AfterEnum:       true
+  AfterFunction:   true
+  AfterNamespace:  true
+  AfterObjCDeclaration: true
+  AfterStruct:     true
+  AfterUnion:      true
+  AfterExternBlock: true
+  BeforeCatch:     true
+  BeforeElse:      true
+#  BeforeLambdaBody: false # clang-11
+  IndentBraces:    false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true
+BreakBeforeBinaryOperators: All
+BreakBeforeInheritanceComma: false
+BreakInheritanceList: BeforeColon
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: BeforeColon
+BreakAfterJavaFieldAnnotations: false
+BreakStringLiterals: true
+
+ColumnLimit: 0 # Unlimited columns allowed
+
+CommentPragmas:  '^ IWYU pragma:'
+CompactNamespaces: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+Cpp11BracedListStyle: true # Prefer {{},{}} over { {}, {} }
+DeriveLineEnding: false
+DerivePointerAlignment: false
+DisableFormat:   false
+ExperimentalAutoDetectBinPacking: false
+FixNamespaceComments: true # } // namespace Preon 
+ForEachMacros:
+  - foreach
+  - Q_FOREACH
+  - BOOST_FOREACH
+IncludeBlocks:   Preserve # turned off by SortIncludes 
+IncludeCategories:
+  - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
+    Priority:        2
+    SortPriority:    0
+  - Regex:           '^(<|"(gtest|gmock|isl|json)/)'
+    Priority:        3
+    SortPriority:    0
+  - Regex:           '.*'
+    Priority:        1
+    SortPriority:    0
+IncludeIsMainRegex: '(Test)?$'
+IncludeIsMainSourceRegex: ''
+
+# with: BraceWrapping.AfterCaseLabel
+# ```
+# switch (event->button())
+# {
+#     case Qt::RightButton:
+#         m_mouseMode = kZoom;
+#         break;
+#     ...
+# }
+# ```
+IndentCaseLabels: true
+# IndentCaseBlocks: false
+
+IndentGotoLabels: true
+
+# Sadly not context aware with C++ code.
+#    #ifdef PREONMATH_USED_IN_PREON_CODE
+#        #include "core/utility/error_handling.h"
+#
+#// Needed for the "using" below.
+#namespace Preon
+#{
+#namespace Math
+#{
+#} // namespace Math
+#} // namespace Preon
+#using namespace Preon::Math;
+#    #endif // PREONMATH_USED_IN_PREON_CODE
+IndentPPDirectives: BeforeHash
+
+IndentWidth: 4
+IndentWrappedFunctionNames: false
+
+# InsertTrailingCommas: None
+JavaScriptQuotes: Leave
+JavaScriptWrapImports: true
+
+KeepEmptyLinesAtTheStartOfBlocks: false
+MacroBlockBegin: ''
+MacroBlockEnd:   ''
+MaxEmptyLinesToKeep: 1
+
+
+#```
+#namespace Preon
+#{
+#namespace Core
+#{
+#   class Foo
+#   {
+#   }
+#} // namespace Core
+#} // namespace Preon
+#```
+#
+# nested namespaces will take a little bit much space, C++17 does nested ones:
+# namespace Preon::Core {}
+NamespaceIndentation: Inner
+
+ObjCBinPackProtocolList: Auto
+ObjCBlockIndentWidth: 4
+# ObjCBreakBeforeNestedBlockParam: true # clang-11
+ObjCSpaceAfterProperty: true
+ObjCSpaceBeforeProtocolList: true
+
+# revisit if we have maximum columnwidth
+PenaltyBreakAssignment: 2
+PenaltyBreakBeforeFirstCallParameter: 19
+PenaltyBreakComment: 300
+PenaltyBreakFirstLessLess: 120
+PenaltyBreakString: 1000
+PenaltyBreakTemplateDeclaration: 10
+PenaltyExcessCharacter: 1000000
+PenaltyReturnTypeOnItsOwnLine: 60
+
+PointerAlignment: Left
+
+ReflowComments:  true
+
+SortIncludes:    false #Breaks code for now might be desirable though.
+
+SortUsingDeclarations: true
+
+
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+
+# template<int> void foo();
+SpaceAfterTemplateKeyword: false
+SpaceBeforeAssignmentOperators: true
+# vector<int>{ 1, 2, 3 };
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+#if ()
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+#void f() 
+#{}
+SpaceInEmptyBlock: false
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 2
+SpacesInAngles:  false
+SpacesInConditionalStatement: false
+SpacesInContainerLiterals: false # no effect
+SpacesInCStyleCastParentheses: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpaceBeforeSquareBrackets: false
+Standard:        Latest
+StatementMacros:
+  - begin_disable_warnings
+  - end_disable_warnings
+  - DefineSlotPair
+  - Q_UNUSED
+  - Q_OBJECT
+  - Q_INTERFACES
+  - Q_PROPERTY
+  - QT_REQUIRE_VERSION
+TabWidth:        4
+UseCRLF:         false
+UseTab:          Never
+...
+

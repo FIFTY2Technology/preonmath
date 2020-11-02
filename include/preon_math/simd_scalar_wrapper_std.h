@@ -3,24 +3,19 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 #pragma once
-#ifndef PREONMATH_SIMD_SCALAR_WRAPPER_STD_H
-#define PREONMATH_SIMD_SCALAR_WRAPPER_STD_H
-
 #include "compile_helper.h"
 
 namespace Preon
 {
-    namespace Math
+namespace Math
+{
+    namespace SimdWrapper
     {
-        namespace SimdWrapper
-        {
-            // sqrt
-            using std::sqrt;
-            using Simd::sqrt;
+        // sqrt
+        using Simd::sqrt;
+        using std::sqrt;
 
-            // add other std functions that are implemented in Simd...
-        }
-    }  // namespace Math
+        // add other std functions that are implemented in Simd...
+    }  // namespace SimdWrapper
+}  // namespace Math
 }  // namespace Preon
-
-#endif  // PREONMATH_SIMD_SCALAR_WRAPPER_STD_H

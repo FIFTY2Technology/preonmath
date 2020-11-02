@@ -5,6 +5,10 @@ Preon::Math is a simple C++ math library that is used for all the basic math ope
 Preon::Math is tested to compile with Visual Studio 2015 and GCC 7.
 
 ## Changes
+### 0.03 - 11.02.2020
+- Added `SymmetricMatrix33`.
+- Added `.clang-format` file and formatted all files with it.
+
 ### 0.02 - 02.20.2020
 - Renamed `vec::zeroVector()` to `vec::zero()`
 - Improved `double`-precision support (new cast methods in `Preon::Math::cast`, new templated operators).
