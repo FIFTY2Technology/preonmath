@@ -4,9 +4,9 @@
 
 #pragma once
 
-#define PREONMATH_USED_IN_PREON_CODE
-#define PREONMATH_UNITS_INTEGRATION
-#define PREONMATH_QT_INTEGRATION
+// #define PREONMATH_USED_IN_PREON_CODE
+// #define PREONMATH_UNITS_INTEGRATION
+// #define PREONMATH_QT_INTEGRATION
 
 // This is something from the preon code. We will try to get rid of it in the preon math code in the future.
 // Includes or defines macros etc depending on if the library is used

@@ -39,7 +39,7 @@ Q_DECLARE_METATYPE(vec3ui)
 namespace std
 {
 template<>
-struct hash<vec3i>
+struct hash<Preon::Math::vec3i>
 {
 private:
     static const size_t PRIME1 = 73856093;
@@ -47,7 +47,7 @@ private:
     static const size_t PRIME3 = 83492791;
 
 public:
-    size_t operator()(const vec3i& v) const
+    size_t operator()(const Preon::Math::vec3i& v) const
     {
         /*static const int size = 4;//sizeof(size_t)
             int iShift=(size*8)/Vector3i::dimension;
@@ -58,12 +58,12 @@ public:
 };
 
 template<>
-struct hash<vec3f>
+struct hash<Preon::Math::vec3f>
 {
 public:
-    size_t operator()(const vec3f& v) const
+    size_t operator()(const Preon::Math::vec3f& v) const
     {
-        return hash<vec3i>()(Preon::interpretAs<vec3i>(v));
+        return hash<Preon::Math::vec3i>()(Preon::interpretAs<Preon::Math::vec3i>(v));
     }
 };
 

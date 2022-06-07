@@ -7,6 +7,7 @@
 #include "compile_helper.h"
 
 #include <cmath>
+#include <cstring>
 
 // RadToDeg: 180 / Pi
 #define FRadiansToDegree 57.295779513082320876798154814105f
@@ -39,7 +40,7 @@ TOut interpretAs(const TIn& input)
 {
     static_assert(sizeof(TOut) == sizeof(TIn), "TOut and TIn must have same byte size!");
     TOut out;
-    memcpy((char*)&out, (char*)&input, sizeof(TIn));
+    std::memcpy((char*)&out, (char*)&input, sizeof(TIn));
     return out;  // Could also implement this with *reinterpret_cast<TOut*>(&input) but apparently this wouldn't be 100% because pointer alignment requirements may be different for different types.
 }
 

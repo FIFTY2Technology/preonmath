@@ -41,6 +41,7 @@ set(header_files
 target_sources(preon_math INTERFACE "$<BUILD_INTERFACE:${header_files}>")
 
 target_include_directories(preon_math INTERFACE include/)
+target_compile_features(preon_math INTERFACE cxx_std_17)
 
 # Tests.
 add_subdirectory(test)

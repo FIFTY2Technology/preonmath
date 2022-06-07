@@ -2,6 +2,9 @@
 *.txt.user*
 .vscode
 
+# Build files.
+build/*
+
 # Prerequisites
 *.d
 
