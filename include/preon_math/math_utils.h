@@ -8,6 +8,7 @@
 
 #include "vec.h"
 #include "scalar_simd.h"
+#include "simd_scalar_wrapper.h"
 
 #include <cmath>
 
@@ -140,6 +141,28 @@ namespace Math
             float x = std::cos(a) * b;
             float y = std::sin(a) * b;
             return vec<2, scalar>(mean + deviation * x, mean + deviation * y);
+        }
+
+        //! Converts a percentage to a factor (dividing by 100).
+        template<class scalar>
+        scalar percentageToFactor(scalar x)
+        {
+            return x * 0.01;
+        }
+
+        //! Same as std::pow, but only works with integer exponents 1-3. Also works with SIMD.
+        template<typename T, typename D>
+        T fastPow123(T x, D exponent)
+        {
+            const auto one = SimdWrapper::make<T>(1.0f);
+            return x * (exponent > 1 ? x : one) * (exponent == 3 ? x : one);
+        }
+
+        //! Computes x(-exponent), only works for integer exponents 1-3. Does not work with SIMD.
+        template<typename T, typename D>
+        T fastRoot123(T x, D exponent)
+        {
+            return exponent == 3 ? std::cbrt(x) : (exponent == 2 ? std::sqrt(x) : x);
         }
     }  // namespace MathUtils
 }  // namespace Math

@@ -18,6 +18,7 @@ namespace Math
     typedef vec<3, int> vec3i;
     typedef vec<3, unsigned short> vec3us;
     typedef vec<3, unsigned char> vec3uc;
+    typedef vec<3, unsigned int> vec3ui;
 
 #define INVALID_POSITION vec3f(F_INFINITY)
 }  // namespace Math
@@ -27,9 +28,11 @@ namespace Math
 Q_DECLARE_TYPEINFO(vec3f, Q_MOVABLE_TYPE);
 Q_DECLARE_TYPEINFO(vec3d, Q_MOVABLE_TYPE);
 Q_DECLARE_TYPEINFO(vec3i, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(vec3ui, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(vec3f)
 Q_DECLARE_METATYPE(vec3d)
 Q_DECLARE_METATYPE(vec3i)
+Q_DECLARE_METATYPE(vec3ui)
 #endif  // PREONMATH_QT_INTEGRATION
 
 // Hash Function.

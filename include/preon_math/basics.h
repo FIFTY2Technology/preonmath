@@ -40,8 +40,7 @@ TOut interpretAs(const TIn& input)
     static_assert(sizeof(TOut) == sizeof(TIn), "TOut and TIn must have same byte size!");
     TOut out;
     memcpy((char*)&out, (char*)&input, sizeof(TIn));
-    return out;  // Could also implement this with *reinterpret_cast<TOut*>(&input) but apparently this wouldn't be 100% because pointer alignment requirements may be different for
-        // different types.
+    return out;  // Could also implement this with *reinterpret_cast<TOut*>(&input) but apparently this wouldn't be 100% because pointer alignment requirements may be different for different types.
 }
 
 namespace Math
@@ -161,6 +160,21 @@ namespace Math
     {
         return DRadiansToDegree * radians;
     }
+
+    // Returns the value of the given argument as primitive type. Can be specialized for custom data types.
+    template<typename T>
+    T PrimitiveType(const T& val)
+    {
+        return val;
+    }
+
+    // Resulting type for multiplication.
+    template<typename T1, typename T2>
+    using product_t = decltype(std::declval<T1>() * std::declval<T2>());
+
+    // Resulting type for division.
+    template<typename T1, typename T2>
+    using quotient_t = decltype(std::declval<T1>() / std::declval<T2>());
 
     // Depracted, just here for existing code, please do not use anymore!
     inline bool FIsZero(float a) { return IsZero<float>(a); }

@@ -100,7 +100,7 @@ namespace Math
         static quat<Real> rotationBetween_nothrow(const vec<3, Real>& from, const vec<3, T_Vec>& to, double minCrossProductLength = 0.0001)
         {
             // the only purpose of this clamping is to deal with Realing point rounding errors. We expect that from and to are normalized.
-            Real angle = std::acos(MathUtils::clamp(vec<3, Real>::template dotProduct<Real, Real, T_Vec>(from, to), Real{-1}, Real{1}));
+            Real angle = std::acos(MathUtils::clamp(vec<3, Real>::template dotProduct<Real, T_Vec>(from, to), Real{-1}, Real{1}));
             vec<3, Real> axis = vec<3, Real>::template crossProduct<Real, T_Vec>(from, to);
             Real length = axis.length();
             if (length > minCrossProductLength)

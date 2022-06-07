@@ -277,14 +277,25 @@ namespace Math
             (*out)[2] = _mm_setr_ps(v0[2], v1[2], v2[2], v3[2]);
         }
 
-        template<class Getter>
-        PREONMATH_FORCEINLINE void setVecs(vec_simd<3, float>* out, const Getter& func)
+        //! Vec4f optimized version.
+        PREONMATH_FORCEINLINE void setVecs(vec_simd<4, float>* out, const vec<4, float>& v0, const vec<4, float>& v1, const vec<4, float>& v2, const vec<4, float>& v3)
+        {
+            (*out)[0] = _mm_loadu_ps((const float*)&v0);
+            (*out)[1] = _mm_loadu_ps((const float*)&v1);
+            (*out)[2] = _mm_loadu_ps((const float*)&v2);
+            (*out)[3] = _mm_loadu_ps((const float*)&v3);
+
+            _MM_TRANSPOSE4_PS((*out)[0], (*out)[1], (*out)[2], (*out)[3]);
+        }
+
+        template<class Getter, size_t D>
+        PREONMATH_FORCEINLINE void setVecs(vec_simd<D, float>* out, const Getter& func)
         {
             setVecs(out, func(0), func(1), func(2), func(3));
         }
 
-        template<class Getter>
-        PREONMATH_FORCEINLINE void setVecs(vec_simd<3, float>* out, const Getter& func, uint numElements, const vec<3, float>& fillValue)
+        template<class Getter, size_t D>
+        PREONMATH_FORCEINLINE void setVecs(vec_simd<D, float>* out, const Getter& func, uint numElements, const vec<D, float>& fillValue)
         {
             setVecs(out, func(0), (numElements > 1) ? func(1) : fillValue, (numElements > 2) ? func(2) : fillValue, (numElements > 3) ? func(3) : fillValue);
         }

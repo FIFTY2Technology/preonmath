@@ -24,7 +24,7 @@ namespace Math
     {
     public:
         euler()
-            : euler(0, 0, 0) {}
+            : euler(T(0), T(0), T(0)) {}
         euler(T phi, T theta, T psi)
             : m_Data(phi, theta, psi) {}
         explicit euler(const vec<3, T>& vector)
@@ -55,6 +55,7 @@ namespace Math
 
         T& operator[](size_t i) { return m_Data[i]; }
         const T& operator[](size_t i) const { return m_Data[i]; }
+        auto operator()() const { return euler<decltype(std::declval<T>()())>(m_Data()); }
 
     private:
         vec<3, T> m_Data;

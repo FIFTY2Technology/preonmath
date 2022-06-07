@@ -88,7 +88,7 @@ namespace Math
 
         // Filling
         inline void fill(T value);
-        inline void setToZero() { fill(scalar_zero()); }
+        inline void setToZero() { fill(scalar_zero<T>()); }
         static matrix<M, N, T> zero()
         {
             matrix<M, N, T> m;
@@ -182,17 +182,6 @@ namespace Math
         // This constructor is private, as the size of the initializer list cannot
         // be checked at compile time, which may lead to unintuitive behavior.
         matrix(const std::initializer_list<T>& values);
-
-        template<typename E = T>
-        PREONMATH_FORCEINLINE static enable_if_non_simd<E, E> scalar_zero()
-        {
-            return static_cast<E>(0);
-        }
-        template<typename E = T>
-        PREONMATH_FORCEINLINE static enable_if_simd<E, E> scalar_zero()
-        {
-            return Simd::zero<float>();
-        }
 
         template<typename E>
         void legacyInitZeroFunc(enable_if_non_simd<E, void*> = nullptr)

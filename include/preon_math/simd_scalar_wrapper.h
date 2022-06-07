@@ -18,16 +18,36 @@ namespace Math
 {
     namespace SimdWrapper
     {
+        template<typename T>
+        struct Scalar
+        {
+            using type = typename Simd::Scalar<T>::type;
+        };
+        template<>
+        struct Scalar<float>
+        {
+            using type = float;
+        };
+        template<>
+        struct Scalar<double>
+        {
+            using type = double;
+        };
+
         /* Base class for transparently storing scalar and SIMD versions of a value. */
         template<typename T_Scalar, typename T_Simd>
         class Base
         {
+        public:
+            using ScalarType = T_Scalar;
+            using SimdType = T_Simd;
+
         protected:
             Base(T_Scalar value, T_Simd valueSimd)
                 : m_Value(value), m_ValueSimd(valueSimd) {}
 
             T_Scalar m_Value;
-            T_Simd m_ValueSimd;
+            alignas(16) T_Simd m_ValueSimd;
         };
 
         /* This class transparently stores the same value as scalar and SIMD floating point value.
@@ -159,6 +179,11 @@ namespace Math
             return Simd::make<float>(val);
         }
         template<>
+        inline double make<double>(float val)
+        {
+            return val;
+        }
+        template<>
         inline double make<double>(double val)
         {
             return val;
@@ -270,6 +295,17 @@ namespace Math
             std::for_each(vals.begin(), vals.end(), [](float& v) { v = cos(v); });
             return Simd::load(vals.data());
         }
+        // exp
+        inline float exp(float val) { return std::exp(val); }
+        inline float_simd exp(float_simd val)
+        {
+            // TODO: this is not very efficient
+            std::array<float, Simd::Register<float>::size> vals;
+            Simd::store(val, vals.data());
+            std::for_each(vals.begin(), vals.end(), [](float& v) { v = exp(v); });
+            return Simd::load(vals.data());
+        }
+
     }  // namespace SimdWrapper
 }  // namespace Math
 }  // namespace Preon

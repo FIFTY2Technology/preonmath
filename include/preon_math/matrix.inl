@@ -300,8 +300,8 @@ namespace Math
     template<size_t _M, size_t _N>
     T matrix<M, N, T>::trace(typename std::enable_if<_M == _N, T>::type*) const
     {
-        T trace = 0;
-        for (size_t d = 0; d < M; d++)
+        T trace = element(0, 0);
+        for (size_t d = 1; d < M; d++)
             trace += element(d, d);
 
         return trace;

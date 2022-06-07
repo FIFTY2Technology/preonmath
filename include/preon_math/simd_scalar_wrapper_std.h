@@ -4,6 +4,9 @@
 
 #pragma once
 #include "compile_helper.h"
+#include "scalar_simd.h"
+
+#include <cmath>
 
 namespace Preon
 {

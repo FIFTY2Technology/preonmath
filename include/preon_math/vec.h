@@ -7,6 +7,7 @@
 #include "compile_helper.h"
 
 #include "basics.h"
+#include "initializers.h"
 #include "scalar_simd.h"
 #include "simd_scalar_wrapper_std.h"
 #include "static_for.h"
@@ -79,18 +80,6 @@ namespace Math
             {
             }
         };
-
-        template<typename E = T>
-        PREONMATH_FORCEINLINE static enable_if_non_simd<E, E> scalar_zero()
-        {
-            return E(0);
-        }
-
-        template<typename E = T>
-        PREONMATH_FORCEINLINE static enable_if_simd<E, E> scalar_zero()
-        {
-            return Simd::zero<typename Simd::Scalar<T>::type>();
-        }
 
     public:
         /** Constructors **/
@@ -307,8 +296,8 @@ namespace Math
         /** Length **/
 
         T length() const { return SimdWrapper::sqrt(lengthSquared()); }
-        T lengthSquared() const { return dotProduct(*this, *this); }
-        T squaredDistance(const vec<D, T>& other) const { return ((*this) - other).lengthSquared(); }  // TODO: move it to an auxiliary class
+        product_t<T, T> lengthSquared() const { return dotProduct(*this, *this); }
+        product_t<T, T> squaredDistance(const vec<D, T>& other) const { return ((*this) - other).lengthSquared(); }  // TODO: move it to an auxiliary class
 
         /** Normalization **/
 
@@ -369,16 +358,24 @@ namespace Math
             return *this;
         }
 
-        vec<D, T>& operator*=(T scalar)
+        template<typename F, typename = enable_if_scalar<F>>
+        vec<D, T>& operator*=(F scalar)
         {
             setAll([&](size_t d) { return m_Data[d] * scalar; });
             return *this;
         }
 
-        vec<D, T>& operator/=(T scalar)
+        template<typename F, typename = enable_if_scalar<F>>
+        vec<D, T>& operator/=(F scalar)
         {
             setAll([&](size_t d) { return m_Data[d] / scalar; });
             return *this;
+        }
+
+        operator T() const
+        {
+            static_assert(D == 1, "Scalar operator only available for 1-dimensional vectors");
+            return m_Data[0];
         }
 
         template<typename U = T, typename V = T>
@@ -387,20 +384,21 @@ namespace Math
             return vec<D, U>([&](size_t d) { return (*this)[d] * factor[d]; });
         }
 
-        vec<D, T> elementWiseDivision(const vec<D, T>& divisor) const
+        template<typename U = T, typename V = T>
+        vec<D, U> elementWiseDivision(const vec<D, V>& divisor) const
         {
-            return vec<D, T>([&](size_t d) { return (*this)[d] / divisor[d]; });
+            return vec<D, U>([&](size_t d) { return (*this)[d] / divisor[d]; });
         }
 
-        template<typename T_Out = T, typename T_Vec1, typename T_Vec2>
-        static PREONMATH_FORCEINLINE T_Out dotProduct(const vec<D, T_Vec1>& v1, const vec<D, T_Vec2>& v2)
+        template<typename T_Vec1, typename T_Vec2>
+        static PREONMATH_FORCEINLINE product_t<T_Vec1, T_Vec2> dotProduct(const vec<D, T_Vec1>& v1, const vec<D, T_Vec2>& v2)
         {
-            T_Out out = v1[0] * v2[0];
-            StaticFor<1, D>([&](size_t d) { out = out + (v1[d] * v2[d]); });
+            product_t<T_Vec1, T_Vec2> out = v1[0] * v2[0];
+            StaticFor<1, D>([&](size_t d) { out = out + product_t<T_Vec1, T_Vec2>(v1[d] * v2[d]); });
             return out;
         }
 
-        static PREONMATH_FORCEINLINE T dotProduct(const vec<D, T>& v1, const vec<D, T>& v2) { return dotProduct<T, T, T>(v1, v2); }
+        static PREONMATH_FORCEINLINE product_t<T, T> dotProduct(const vec<D, T>& v1, const vec<D, T>& v2) { return dotProduct<T, T>(v1, v2); }
 
         /** Cross product **/
 
@@ -429,7 +427,14 @@ namespace Math
         }
 
         /** Elementwise operations **/
-        //! Only divides those elements whose divisor is different form 0. Else, set the result to 0.
+
+        //! Calls the function call operator on each element.
+        auto operator()() const
+        {
+            return vec<D, decltype(std::declval<T>()())>([this](size_t d) { return element(d)(); });
+        }
+
+        //! Only divides those elements whose divisor is different from 0. Else, set the result to 0.
         template<typename E = T>
         vec<D, T> elementWisePseudoDivision(const enable_if_non_simd<E, vec<D, T>>& divisor) const
         {
@@ -603,7 +608,7 @@ namespace Math
         return scalar * v;
     }
 
-    template<size_t D, typename T, typename F>
+    template<size_t D, typename T, typename F, typename = enable_if_scalar<F>>
     vec<D, T> operator/(const vec<D, T>& v, const F scalar)
     {
         return vec<D, T>([&](size_t d) { return v[d] / scalar; });
@@ -621,16 +626,16 @@ namespace Math
         return vec<D, T>([&](size_t d) { return v1[d] - v2[d]; });
     }
 
-    template<size_t D, typename T_Out, typename T_Vec1, typename T_Vec2>
-    T_Out operator*(const vec<D, T_Vec1>& v1, const vec<D, T_Vec2>& v2)
+    template<size_t D, typename T_Vec1, typename T_Vec2>
+    product_t<T_Vec1, T_Vec2> operator*(const vec<D, T_Vec1>& v1, const vec<D, T_Vec2>& v2)
     {
-        return vec<D, T_Out>::template dotProduct<T_Out, T_Vec1, T_Vec2>(v1, v2);
+        return vec<D, product_t<T_Vec1, T_Vec2>>::template dotProduct<T_Vec1, T_Vec2>(v1, v2);
     }
 
     template<size_t D, typename T>
-    T operator*(const vec<D, T>& v1, const vec<D, T>& v2)
+    product_t<T, T> operator*(const vec<D, T>& v1, const vec<D, T>& v2)
     {
-        return operator*<D, T, T, T>(v1, v2);
+        return operator*<D, T, T>(v1, v2);
     }
 
     template<size_t D, typename T>
