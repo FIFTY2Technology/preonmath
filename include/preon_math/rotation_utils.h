@@ -140,13 +140,13 @@ namespace Math
             return quaternionsFromEulerAngles(eulerAnglesFromMatrix(m));
         }
 
-        inline vec3d angularVelocityViaRotationMatrix(const matrix33d& Rot1, const matrix33d& Rot2, qreal dt)
+        inline vec3d angularVelocityViaRotationMatrix(const matrix33d& Rot1, const matrix33d& Rot2, double dt)
         {
             matrix33d omegaTilde = 1.0 / dt * (Rot2 - Rot1) * Rot1.transposed();
             return vec3d(omegaTilde(2, 1), omegaTilde(0, 2), omegaTilde(1, 0));
         }
 
-        inline vec3d angularVelocityViaEuler(const eulerd& e1, const eulerd& e2, qreal dt)
+        inline vec3d angularVelocityViaEuler(const eulerd& e1, const eulerd& e2, double dt)
         {
             // If Euler angles are the same, angular velocity must be zero
             if (e1 == e2)
