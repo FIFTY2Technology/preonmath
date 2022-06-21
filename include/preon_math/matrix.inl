@@ -278,7 +278,7 @@ namespace Math
     template<size_t _M, size_t _N>
     T matrix<M, N, T>::determinant(typename std::enable_if<_M == _N && _M != 2 && _M != 3, T>::type*) const
     {
-        return ::determinant(*this, M);
+        return determinant(*this, M);
     }
 
     template<size_t M, size_t N, typename T>
