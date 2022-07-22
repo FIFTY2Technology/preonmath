@@ -12,7 +12,7 @@
 #ifdef PREONMATH_COMPILER_MSVC
     #include <intrin.h>
 #else
-    #include <x86intrin.h>
+    #include <immintrin.h>
 #endif
 
 namespace Preon
@@ -38,7 +38,7 @@ namespace Math
         }
 
         template<size_t M, size_t N, typename T, class Getter>
-        PREONMATH_FORCEINLINE void setValues(matrix_simd<M, N, T>* out, const Getter& func, uint numElements, const matrix<M, N, T>& fillValue)
+        PREONMATH_FORCEINLINE void setValues(matrix_simd<M, N, T>* out, const Getter& func, uint32_t numElements, const matrix<M, N, T>& fillValue)
         {
             setValues(out, func(0), (numElements > 1) ? func(1) : fillValue, (numElements > 2) ? func(2) : fillValue, (numElements > 3) ? func(3) : fillValue);
         }

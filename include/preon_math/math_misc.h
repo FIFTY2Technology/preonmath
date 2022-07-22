@@ -5,6 +5,7 @@
 #pragma once
 
 #include "compile_helper.h"
+#include "basics.h"
 
 #include "vec3.h"
 
@@ -14,17 +15,19 @@ namespace Math
 {
     struct MathMisc
     {
-        static float rayPlaneIntersection(const vec3f& rayOrigin, const vec3f& rayDir, const vec3f& planeNormal, const vec3f& planePos)
+        template<typename scalar>
+        static scalar rayPlaneIntersection(const vec<3, scalar>& rayOrigin, const vec<3, scalar>& rayDir, const vec<3, scalar>& planeNormal, const vec<3, scalar>& planePos)
         {
-            float denom = vec3f::dotProduct(rayDir, planeNormal);
-            if (std::fabs(denom) <= 0.000001f)
-                denom = 0.000001f;
-            return vec3f::dotProduct(planeNormal, planePos - rayOrigin) / denom;
+            scalar denom = vec<3, scalar>::dotProduct(rayDir, planeNormal);
+            if (std::abs(denom) <= Math::PreonReal<scalar>::eps())
+                denom = Math::PreonReal<scalar>::eps();
+            return vec<3, scalar>::dotProduct(planeNormal, planePos - rayOrigin) / denom;
         }
 
-        static vec3f projectPointOnLine(const vec3f& p, const vec3f& line1, const vec3f& line2, float& t)
+        template<typename scalar>
+        static vec<3, scalar> projectPointOnLine(const vec<3, scalar>& p, const vec<3, scalar>& line1, const vec<3, scalar>& line2, scalar& t)
         {
-            vec3f rayDir = line2 - line1;
+            vec<3, scalar> rayDir = line2 - line1;
             t = rayPlaneIntersection(line1, rayDir, rayDir, p);
             return line1 + rayDir * t;
         }
@@ -52,7 +55,7 @@ namespace Math
         {
             tMin = 0.0f;
             tMax = 0.0f;
-            for (uint d = 0; d < 3; d++)
+            for (uint32_t d = 0; d < 3; d++)
             {
                 bool negative = axis[d] < 0.0f;
                 tMin += aabbMinMax[negative][d] * axis[d];

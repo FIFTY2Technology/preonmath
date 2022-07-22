@@ -111,7 +111,7 @@ namespace Math
         }
 
         template<class Getter>
-        PREONMATH_FORCEINLINE void setScalars(float_simd* out, const Getter& func, uint numElements, float fillValue)
+        PREONMATH_FORCEINLINE void setScalars(float_simd* out, const Getter& func, uint32_t numElements, float fillValue)
         {
             (*out) = _mm256_setr_ps(
                 func(0),
@@ -124,7 +124,7 @@ namespace Math
                 (numElements > 7) ? func(7) : fillValue);
         }
         template<class Getter>
-        PREONMATH_FORCEINLINE void setScalars(double_simd* out, const Getter& func, uint numElements, double fillValue)
+        PREONMATH_FORCEINLINE void setScalars(double_simd* out, const Getter& func, uint32_t numElements, double fillValue)
         {
             (*out) = _mm256_setr_pd(func(0), (numElements > 1) ? func(1) : fillValue, (numElements > 2) ? func(2) : fillValue, (numElements > 3) ? func(3) : fillValue);
         }

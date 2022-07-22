@@ -15,7 +15,7 @@
 #ifdef PREONMATH_COMPILER_MSVC
     #include <intrin.h>
 #else
-    #include <x86intrin.h>
+    #include <immintrin.h>
 #endif
 
 #include <utility>
@@ -119,7 +119,7 @@ namespace Math
         }
 
         template<class Getter>
-        PREONMATH_FORCEINLINE void setVecs(vec_simd<3>* out, const Getter& func, uint numElements, const vec<3, float>& fillValue)
+        PREONMATH_FORCEINLINE void setVecs(vec_simd<3>* out, const Getter& func, uint32_t numElements, const vec<3, float>& fillValue)
         {
             if (numElements > 4)
             {
@@ -295,7 +295,7 @@ namespace Math
         }
 
         template<class Getter, size_t D>
-        PREONMATH_FORCEINLINE void setVecs(vec_simd<D, float>* out, const Getter& func, uint numElements, const vec<D, float>& fillValue)
+        PREONMATH_FORCEINLINE void setVecs(vec_simd<D, float>* out, const Getter& func, uint32_t numElements, const vec<D, float>& fillValue)
         {
             setVecs(out, func(0), (numElements > 1) ? func(1) : fillValue, (numElements > 2) ? func(2) : fillValue, (numElements > 3) ? func(3) : fillValue);
         }
@@ -328,7 +328,7 @@ namespace Math
         }
 
         template<class Getter>
-        PREONMATH_FORCEINLINE void setVecs(vec_simd<3, double>* out, const Getter& func, uint numElements, const vec<3, double>& fillValue)
+        PREONMATH_FORCEINLINE void setVecs(vec_simd<3, double>* out, const Getter& func, uint32_t numElements, const vec<3, double>& fillValue)
         {
             setVecs(out, func(0), (numElements > 1) ? func(1) : fillValue);
         }
