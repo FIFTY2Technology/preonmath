@@ -4,9 +4,29 @@
 
 #pragma once
 
-// #define PREONMATH_USED_IN_PREON_CODE
+#ifdef __NVCC__
+    #define PREONMATH_CUDA
+#endif
+
+#ifndef PREONMATH_CUDA
+    #include <stddef.h>  // Needed for size_t
+    // #define PREONMATH_USED_IN_PREON_CODE
+    // #define PREONMATH_QT_INTEGRATION
+    #define PREONMATH_ENABLE_SIMD
+    #define PREONMATH_DEFAULTINIT  // Initializes vectors and matrices to zero (or identity for square matrices) in the default constructor.
+#endif
+
+#define ENABLE_USING_PREON_MATH
 // #define PREONMATH_UNITS_INTEGRATION
-// #define PREONMATH_QT_INTEGRATION
+
+namespace Preon::Math
+{
+using PrMathSize = int;
+}  // namespace Preon::Math
+
+#ifdef ENABLE_USING_PREON_MATH
+using namespace Preon::Math;
+#endif
 
 // This is something from the preon code. We will try to get rid of it in the preon math code in the future.
 // Includes or defines macros etc depending on if the library is used
@@ -14,14 +34,6 @@
 #ifdef PREONMATH_USED_IN_PREON_CODE
     #include "core/utility/error_handling.h"
 
-// Needed for the "using" below.
-namespace Preon
-{
-namespace Math
-{
-}  // namespace Math
-}  // namespace Preon
-using namespace Preon::Math;
 #endif  // PREONMATH_USED_IN_PREON_CODE
 #ifndef THROW_EXCEPTION
     #define THROW_EXCEPTION(condition, exception) \
@@ -40,12 +52,22 @@ using namespace Preon::Math;
 #endif
 
 #ifndef PREONMATH_FORCEINLINE
-    #ifdef PREONMATH_COMPILER_MSVC
+    #ifdef PREONMATH_CUDA
+        #define PREONMATH_FORCEINLINE __host__ __device__
+    #elif defined(PREONMATH_COMPILER_MSVC)
         #define PREONMATH_FORCEINLINE __forceinline
     #else
         #define PREONMATH_FORCEINLINE __attribute__((always_inline)) inline
     #endif  // PREONMATH_COMPILER_MSVC
 #endif  // PREONMATH_FORCEINLINE
+
+#ifndef PREONMATH_DEVICE
+    #ifdef PREONMATH_CUDA
+        #define PREONMATH_DEVICE __host__ __device__
+    #else
+        #define PREONMATH_DEVICE
+    #endif
+#endif
 
 #ifndef PREONMATH_NOINLINE
     #ifdef PREONMATH_COMPILER_MSVC

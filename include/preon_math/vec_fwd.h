@@ -12,22 +12,28 @@ namespace Preon
 {
 namespace Math
 {
-    template<std::size_t D, typename T>
+    template<PrMathSize D, typename T>
     class vec;
 
     // Vec2.
-    typedef vec<2, float> vec2f;
-    typedef vec<2, double> vec2d;
-    typedef vec<2, int> vec2i;
+    template<typename T>
+    using vec2 = vec<2, T>;
+    using vec2f = vec2<float>;
+    using vec2d = vec2<double>;
+    using vec2i = vec<2, int>;
 
     // Vec3.
-    typedef vec<3, float> vec3f;
-    typedef vec<3, double> vec3d;
-    typedef vec<3, int> vec3i;
+    template<typename T>
+    using vec3 = vec<3, T>;
+    using vec3f = vec3<float>;
+    using vec3d = vec3<double>;
+    using vec3i = vec3<int>;
 
     // Vec4.
-    typedef vec<4, float> vec4f;
-    typedef vec<4, double> vec4d;
-    typedef vec<4, int> vec4i;
+    template<typename T>
+    using vec4 = vec<4, T>;
+    using vec4f = vec4<float>;
+    using vec4d = vec4<double>;
+    using vec4i = vec4<int>;
 }  // namespace Math
 }  // namespace Preon

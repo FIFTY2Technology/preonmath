@@ -6,30 +6,32 @@
 
 #include "compile_helper.h"
 
-#include "vec.h"
-#include "scalar_simd.h"
-#include "vec.h"
-#include "vec3.h"
-#include "static_for.h"
+#ifdef PREONMATH_ENABLE_SIMD
 
-#ifdef PREONMATH_COMPILER_MSVC
-    #include <intrin.h>
-#else
-    #include <immintrin.h>
-#endif
+    #include "vec.h"
+    #include "scalar_simd.h"
+    #include "vec.h"
+    #include "vec3.h"
+    #include "static_for.h"
 
-#include <utility>
+    #ifdef PREONMATH_COMPILER_MSVC
+        #include <intrin.h>
+    #else
+        #include <immintrin.h>
+    #endif
+
+    #include <utility>
 
 namespace Preon
 {
 namespace Math
 {
-    template<size_t D, typename T = float>
+    template<PrMathSize D, typename T = float>
     using vec_simd = vec<D, typename Simd::Register<T>::type>;
 
     namespace Simd
     {
-#ifdef USE_AVX
+    #ifdef USE_AVX
         // =======================================================================================
         // ================================== AVX specific =======================================
         // =======================================================================================
@@ -38,7 +40,7 @@ namespace Math
         // ==================================== Load =============================================
         // =======================================================================================
 
-        template<size_t D>
+        template<PrMathSize D>
         PREONMATH_FORCEINLINE void setVecs(
             typename std::enable_if<D != 3, vec<3, float>>::type* out,
             const vec<D, float>& v0,
@@ -50,7 +52,7 @@ namespace Math
             const vec<D, float>& v6,
             const vec<D, float>& v7)
         {
-            StaticFor<0, D>([&](size_t d) { (*out)[d] = _mm256_setr_ps(v0[d], v1[d], v2[d], v3[d], v4[d], v5[d], v6[d], v7[d]); });
+            StaticFor<0, D>([&](PrMathSize d) { (*out)[d] = _mm256_setr_ps(v0[d], v1[d], v2[d], v3[d], v4[d], v5[d], v6[d], v7[d]); });
         }
 
         //! Vec3f optimized version.
@@ -129,7 +131,7 @@ namespace Math
             else
             {
                 setVecs_1(out, func(0), (numElements > 1) ? func(1) : fillValue, (numElements > 2) ? func(2) : fillValue, (numElements > 3) ? func(3) : fillValue);
-                StaticFor<0, 3>([&](size_t d) { (*out)[d] = _mm256_insertf128_ps((*out)[d], _mm_broadcast_ss(&fillValue[d]), 1); });
+                StaticFor<0, 3>([&](PrMathSize d) { (*out)[d] = _mm256_insertf128_ps((*out)[d], _mm_broadcast_ss(&fillValue[d]), 1); });
             }
         }
 
@@ -160,7 +162,7 @@ namespace Math
         // ==================================== Store ============================================
         // =======================================================================================
 
-        template<size_t D>
+        template<PrMathSize D>
         PREONMATH_FORCEINLINE void getVecs(
             const vec_simd<D>& input,
             vec<D, float>& v0,
@@ -173,7 +175,7 @@ namespace Math
             vec<D, float>& v7)
         {
             float buffer[8];
-            StaticFor<0, D>([&](size_t d) {
+            StaticFor<0, D>([&](PrMathSize d) {
                 _mm256_storeu_ps(buffer, input[d]);
                 v0[d] = buffer[0];
                 v1[d] = buffer[1];
@@ -186,7 +188,7 @@ namespace Math
             });
         }
 
-        template<size_t D, class Getter>
+        template<PrMathSize D, class Getter>
         PREONMATH_FORCEINLINE void storeVecs(const vec_simd<D>& input, const Getter& func)
         {
             getVecs<D>(input, func(0), func(1), func(2), func(3), func(4), func(5), func(6), func(7));
@@ -197,7 +199,7 @@ namespace Math
         // =======================================================================================
 
         //! For each register, the 4 values are summed up.
-        template<size_t D>
+        template<PrMathSize D>
         PREONMATH_FORCEINLINE typename std::enable_if<D != 3, vec<D, float>>::type hSum(const vec_simd<D>& v)
         {
             vec<D, float> out;
@@ -206,7 +208,7 @@ namespace Math
         }
 
         //! Optimized version of horizontal add for 3D-vectors. Performs four _mm_hadd_ps instead of six.
-        template<size_t D>
+        template<PrMathSize D>
         PREONMATH_FORCEINLINE typename std::enable_if<D == 3, vec3f>::type hSum(const vec_simd<D>& v)
         {
             vec3f out;
@@ -226,7 +228,7 @@ namespace Math
 
             return out;
         }
-#else
+    #else
         // =======================================================================================
         // ================================== SSE specific =======================================
         // =======================================================================================
@@ -258,11 +260,11 @@ namespace Math
             return vec<3, float_simd>::zero();
         }
 
-        template<size_t D>
+        template<PrMathSize D>
         PREONMATH_FORCEINLINE void
         setVecs(typename std::enable_if<D != 3, vec_simd<D, float>>::type* out, const vec<D, float>& v0, const vec<D, float>& v1, const vec<D, float>& v2, const vec<D, float>& v3)
         {
-            StaticFor<0, D>([&](size_t d) { (*out)[d] = _mm_setr_ps(v0[d], v1[d], v2[d], v3[d]); });
+            StaticFor<0, D>([&](PrMathSize d) { (*out)[d] = _mm_setr_ps(v0[d], v1[d], v2[d], v3[d]); });
         }
 
         //! Vec3f optimized version.
@@ -288,13 +290,13 @@ namespace Math
             _MM_TRANSPOSE4_PS((*out)[0], (*out)[1], (*out)[2], (*out)[3]);
         }
 
-        template<class Getter, size_t D>
+        template<class Getter, PrMathSize D>
         PREONMATH_FORCEINLINE void setVecs(vec_simd<D, float>* out, const Getter& func)
         {
             setVecs(out, func(0), func(1), func(2), func(3));
         }
 
-        template<class Getter, size_t D>
+        template<class Getter, PrMathSize D>
         PREONMATH_FORCEINLINE void setVecs(vec_simd<D, float>* out, const Getter& func, uint32_t numElements, const vec<D, float>& fillValue)
         {
             setVecs(out, func(0), (numElements > 1) ? func(1) : fillValue, (numElements > 2) ? func(2) : fillValue, (numElements > 3) ? func(3) : fillValue);
@@ -315,10 +317,10 @@ namespace Math
         }
 
         //! Double loaders. No fancy optimizations here for now.
-        template<size_t D>
+        template<PrMathSize D>
         PREONMATH_FORCEINLINE void setVecs(vec_simd<3, double>* out, const vec<D, double>& v0, const vec<D, double>& v1)
         {
-            StaticFor<0, D>([&](size_t d) { (*out)[d] = _mm_setr_pd(v0[d], v1[d]); });
+            StaticFor<0, D>([&](PrMathSize d) { (*out)[d] = _mm_setr_pd(v0[d], v1[d]); });
         }
 
         template<class Getter>
@@ -344,11 +346,11 @@ namespace Math
         // ==================================== Store ============================================
         // =======================================================================================
 
-        template<size_t D>
+        template<PrMathSize D>
         PREONMATH_FORCEINLINE void getVecs(const vec_simd<D, float>& input, vec<D, float>& v0, vec<D, float>& v1, vec<D, float>& v2, vec<D, float>& v3)
         {
             float buffer[4];
-            StaticFor<0, D>([&](size_t d) {
+            StaticFor<0, D>([&](PrMathSize d) {
                 _mm_storeu_ps(buffer, input[d]);
                 v0[d] = buffer[0];
                 v1[d] = buffer[1];
@@ -357,17 +359,17 @@ namespace Math
             });
         }
 
-        template<size_t D, class Getter>
+        template<PrMathSize D, class Getter>
         PREONMATH_FORCEINLINE void storeVecs(const vec_simd<D, float>& input, const Getter& func)
         {
             getVecs<D>(input, func(0), func(1), func(2), func(3));
         }
 
-        template<size_t D>
+        template<PrMathSize D>
         PREONMATH_FORCEINLINE void getVecs(const vec_simd<D, double>& input, vec<D, double>& v0, vec<D, double>& v1)
         {
             double buffer[2];
-            for (size_t d = 0; d < D; ++d)
+            for (PrMathSize d = 0; d < D; ++d)
             {
                 _mm_storeu_pd(buffer, input[d]);
                 v0[d] = buffer[0];
@@ -375,7 +377,7 @@ namespace Math
             }
         }
 
-        template<size_t D, class Getter>
+        template<PrMathSize D, class Getter>
         PREONMATH_FORCEINLINE void storeVecs(const vec_simd<D, double>& input, const Getter& func)
         {
             getVecs<D>(input, func(0), func(1));
@@ -386,7 +388,7 @@ namespace Math
         // =======================================================================================
 
         //! For each register, the 4 values are summed up.
-        template<size_t D>
+        template<PrMathSize D>
         PREONMATH_FORCEINLINE typename std::enable_if<D != 3, vec<D, float>>::type hSum(const vec_simd<D, float>& v)
         {
             vec<D, float> out;
@@ -395,7 +397,7 @@ namespace Math
         }
 
         //! Optimized version of horizontal add for 3D-vectors. Performs four _mm_hadd_ps instead of six.
-        template<size_t D>
+        template<PrMathSize D>
         PREONMATH_FORCEINLINE typename std::enable_if<D == 3, vec3f>::type hSum(const vec_simd<D, float>& v)
         {
             vec3f out;
@@ -408,27 +410,27 @@ namespace Math
             return out;
         }
 
-        template<size_t D>
+        template<PrMathSize D>
         PREONMATH_FORCEINLINE vec<D, double> hSum(const vec_simd<D, double>& v)
         {
             vec<D, double> out;
-            for (size_t d = 0; d < D; ++d)
+            for (PrMathSize d = 0; d < D; ++d)
                 out[d] = hSum(v[d]);
             return out;
         }
 
-#endif
+    #endif
         // =======================================================================================
         // ==================================== SSE / AVX agnostic ===============================
         // =======================================================================================
 
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         PREONMATH_FORCEINLINE void load(vec_simd<D, T>* out, const T* values, int d)
         {
             (*out)[d] = load(values);
         }
 
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         PREONMATH_FORCEINLINE void store(const vec_simd<D, T>& input, T* values, int d)
         {
             store(values, input[d]);
@@ -443,7 +445,7 @@ namespace Math
         }
 
         //! Performs mask[d] ? v1[d] : v2[d] for each component and returns the result.
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         PREONMATH_FORCEINLINE vec_simd<D, T> choose(const vec_simd<D, T>& mask, const vec_simd<D, T>& v1, const vec_simd<D, T>& v2)
         {
             vec_simd<D, T> out;
@@ -452,7 +454,7 @@ namespace Math
         }
 
         //! Performs mask[d] ? v1[d] : v2[d] for each component and returns the result.
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         PREONMATH_FORCEINLINE vec_simd<D, T> choose(T mask, const vec_simd<D, T>& v1, const vec_simd<D, T>& v2)
         {
             vec_simd<D, T> out;
@@ -461,14 +463,14 @@ namespace Math
         }
 
         //! Performs mask[d] ? vec[d] : 0 for each component and returns the result.
-        template<size_t D>
+        template<PrMathSize D>
         PREONMATH_FORCEINLINE vec_simd<D, float> and_mask(const vec_simd<D, float>& vec, float_simd mask)
         {
-            return vec_simd<D, float>([&](size_t d) { return Simd::and_mask(vec[d], mask); });
+            return vec_simd<D, float>([&](PrMathSize d) { return Simd::and_mask(vec[d], mask); });
         }
 
         // Todo: Implement more efficient horizontal max and min.
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         PREONMATH_FORCEINLINE vec<D, T> hMax(const vec_simd<D, T>& v)
         {
             vec<D, T> out;
@@ -476,7 +478,7 @@ namespace Math
             return out;
         }
 
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         PREONMATH_FORCEINLINE vec<D, T> hMin(const vec_simd<D, T>& v)
         {
             vec<D, T> out;
@@ -486,3 +488,5 @@ namespace Math
     }  // namespace Simd
 }  // namespace Math
 }  // namespace Preon
+
+#endif

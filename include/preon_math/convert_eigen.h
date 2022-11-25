@@ -15,19 +15,19 @@ namespace Preon
 {
 namespace Math
 {
-    template<typename scalar, size_t M, size_t N>
+    template<typename scalar, PrMathSize M, PrMathSize N>
     Eigen::Matrix<scalar, static_cast<int>(M), static_cast<int>(N)> toEigen(const matrix<M, N, scalar>& m)
     {
         Eigen::Matrix<scalar, M, N> em;
-        for (size_t row = 0; row < M; row++)
-            for (size_t column = 0; column < N; column++)
+        for (PrMathSize row = 0; row < M; row++)
+            for (PrMathSize column = 0; column < N; column++)
                 em(row, column) = m(row, column);
         return em;
     }
 
     // Order needs to match the Eigen matrix so that the template arguments can be automatically deduced.
     template<typename scalar, int M, int N>
-    matrix<static_cast<size_t>(M), static_cast<size_t>(N), scalar> fromEigen(const Eigen::Matrix<scalar, M, N>& em)
+    matrix<static_cast<PrMathSize>(M), static_cast<PrMathSize>(N), scalar> fromEigen(const Eigen::Matrix<scalar, M, N>& em)
     {
         matrix<M, N, scalar> m;
         for (int row = 0; row < M; row++)

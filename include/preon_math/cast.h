@@ -8,21 +8,34 @@
 #include "matrix.h"
 #include "euler.h"
 #include "quat.h"
+#include "symmetric_matrix33.h"
 
 namespace Preon
 {
 namespace Math
 {
-    template<typename TOut, typename TIn, size_t D>
-    vec<D, TOut> cast(const vec<D, TIn>& v)
+    template<typename TOut, typename TIn>
+    TOut cast(const TIn& v)
     {
-        return vec<D, TOut>([&v](size_t i) { return static_cast<TOut>(v[i]); });
+        return static_cast<TOut>(v);
     }
 
-    template<typename TOut, typename TIn, size_t M, size_t N>
+    template<typename TOut, typename TIn, PrMathSize D>
+    vec<D, TOut> cast(const vec<D, TIn>& v)
+    {
+        return vec<D, TOut>([&v](PrMathSize i) { return static_cast<TOut>(v[i]); });
+    }
+
+    template<typename TOut, typename TIn, PrMathSize M, PrMathSize N>
     matrix<M, N, TOut> cast(const matrix<M, N, TIn>& m)
     {
-        return matrix<M, N, TOut>([&m](size_t r, size_t c) { return static_cast<TOut>(m(r, c)); });
+        return matrix<M, N, TOut>([&m](PrMathSize r, PrMathSize c) { return static_cast<TOut>(m(r, c)); });
+    }
+
+    template<typename TOut, typename TIn>
+    SymmetricMatrix33<TOut> cast(const SymmetricMatrix33<TIn>& m)
+    {
+        return SymmetricMatrix33<TOut>([&m](PrMathSize i) { return static_cast<TOut>(m[i]); });
     }
 
     template<typename TOut, typename TIn>

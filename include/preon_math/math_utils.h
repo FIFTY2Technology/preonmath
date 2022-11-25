@@ -48,6 +48,16 @@ namespace Math
         }
 
         /*!
+         * Returns wether the give number can be expressed using an integer exponent of the given base,
+         * i.e, wether there exists an x such that base^x == number.
+         */
+        template<class Real>
+        Real isPowerOf(Real base, Real number)
+        {
+            return Math::AreEqual(nearestPower(base, number), number);
+        }
+
+        /*!
          * Returns the next greater power of 2 for the integer n and the corresponding exponent.
          * No negative input.
          */
@@ -98,6 +108,7 @@ namespace Math
             return clamp(x, scalar{0}, scalar{1});
         }
 
+#ifdef PREONMATH_ENABLE_SIMD
         //! Clamps the given value so that it is in range [0, 1].
         template<class scalar>
         scalar clampToZeroOne(scalar x, enable_if_simd<scalar, void*> = nullptr)
@@ -105,6 +116,7 @@ namespace Math
             static const float_simd one = Simd::make<float>(1.0f);
             return Simd::and_mask(Simd::choose(x > one, one, x), x >= Simd::zero<float>());
         }
+#endif
 
         //! Maps x in range [xMin, xMax] linearly into the range [0, 1].
         template<typename scalar>
@@ -152,17 +164,21 @@ namespace Math
 
         //! Same as std::pow, but only works with integer exponents 1-3. Also works with SIMD.
         template<typename T, typename D>
-        T fastPow123(T x, D exponent)
+        PREONMATH_DEVICE T fastPow123(T x, D exponent)
         {
+#ifdef PREONMATH_ENABLE_SIMD
             const auto one = SimdWrapper::make<T>(1.0f);
+#else
+            const T one = T(1);
+#endif
             return x * (exponent > 1 ? x : one) * (exponent == 3 ? x : one);
         }
 
         //! Computes x(-exponent), only works for integer exponents 1-3. Does not work with SIMD.
         template<typename T, typename D>
-        T fastRoot123(T x, D exponent)
+        PREONMATH_DEVICE T fastRoot123(T x, D exponent)
         {
-            return exponent == 3 ? std::cbrt(x) : (exponent == 2 ? std::sqrt(x) : x);
+            return exponent == 3 ? std::cbrt(x) : (exponent == 2 ? Preon::Math::sqrt(x) : x);
         }
     }  // namespace MathUtils
 }  // namespace Math

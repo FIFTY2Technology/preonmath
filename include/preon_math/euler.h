@@ -7,8 +7,6 @@
 #include "compile_helper.h"
 
 #include "vec.h"
-#include "quat_fwd.h"
-#include "matrix_fwd.h"
 
 #ifdef PREONMATH_QT_INTEGRATION
     #include <QDebug>
@@ -34,6 +32,11 @@ namespace Math
             : m_Data((T)e.phi(), (T)e.theta(), (T)e.psi())
         {
         }
+        template<typename Lambda>
+        euler(const Lambda& f)
+            : m_Data(f)
+        {
+        }
 
         T phi() const { return m_Data[0]; }
         T& phi() { return m_Data[0]; }
@@ -53,9 +56,13 @@ namespace Math
         friend bool operator<(const euler& v1, const euler& v2) { return v1.m_Data < v2.m_Data; }
         friend const euler operator+(const euler& v1, const euler& v2) { return euler(v1.m_Data + v2.m_Data); }
 
-        T& operator[](size_t i) { return m_Data[i]; }
-        const T& operator[](size_t i) const { return m_Data[i]; }
-        auto operator()() const { return euler<decltype(std::declval<T>()())>(m_Data()); }
+        T& operator[](PrMathSize i) { return m_Data[i]; }
+        const T& operator[](PrMathSize i) const { return m_Data[i]; }
+        const std::array<T, 3>& data() const { return m_Data.data(); }
+        auto value() const { return euler<decltype(std::declval<T>().value())>(m_Data.value()); }
+
+        template<typename _T>
+        friend std::stringstream& operator<<(std::stringstream& stream, const euler<_T>&);
 
     private:
         vec<3, T> m_Data;
@@ -64,6 +71,14 @@ namespace Math
     // define instanced types for compatibility reasons
     using eulerf = euler<float>;
     using eulerd = euler<double>;
+
+    template<typename T>
+    std::stringstream& operator<<(std::stringstream& stream, const euler<T>& val)
+    {
+        stream << val.m_Data;
+        return stream;
+    }
+
 }  // namespace Math
 }  // namespace Preon
 

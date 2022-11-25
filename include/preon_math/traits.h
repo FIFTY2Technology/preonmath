@@ -5,6 +5,9 @@
 #pragma once
 
 #include "vec_fwd.h"
+#include "euler.h"
+
+#include <type_traits>
 
 namespace Preon
 {
@@ -14,17 +17,17 @@ namespace Math
     struct Dimension
     {
         template<typename T>
-        static size_t get();
+        static PrMathSize get();
     };
 
     template<>
-    inline size_t Dimension::get<float>()
+    inline PrMathSize Dimension::get<float>()
     {
         return 1;
     }
 
     template<>
-    inline size_t Dimension::get<vec3f>()
+    inline PrMathSize Dimension::get<vec3f>()
     {
         return 3;
     }
@@ -47,7 +50,19 @@ namespace Math
     template<typename Lambda>
     inline void Wrapper<vec3f>::forAll(const vec3f& val, const Lambda& lambda)
     {
-        val.forAll([&](size_t i) { lambda(val[i]); });
+        val.forAll([&](PrMathSize i) { lambda(val[i]); });
     }
+
+    template<typename T>
+    struct IsEuler : std::false_type
+    {
+    };
+    template<typename T>
+    struct IsEuler<euler<T>> : std::true_type
+    {
+    };
+    template<typename T>
+    inline constexpr bool IsEulerV = IsEuler<T>::value;
+
 }  // namespace Math
 }  // namespace Preon

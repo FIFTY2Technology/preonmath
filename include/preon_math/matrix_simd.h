@@ -19,36 +19,36 @@ namespace Preon
 {
 namespace Math
 {
-    template<size_t M, size_t N, typename T = float>
+    template<PrMathSize M, PrMathSize N, typename T = float>
     using matrix_simd = matrix<M, N, typename Simd::Register<T>::type>;
 
     namespace Simd
     {
-        template<size_t M, size_t N, typename T>
+        template<PrMathSize M, PrMathSize N, typename T>
         PREONMATH_FORCEINLINE void setValues(matrix_simd<M, N, T>* out, const matrix<M, N, T>& m0, const matrix<M, N, T>& m1, const matrix<M, N, T>& m2, const matrix<M, N, T>& m3)
         {
-            for (size_t c = 0; c < N; c++)
+            for (PrMathSize c = 0; c < N; c++)
                 setVecs(&out->column(c), m0.column(c), m1.column(c), m2.column(c), m3.column(c));
         }
 
-        template<size_t M, size_t N, typename T, class Getter>
+        template<PrMathSize M, PrMathSize N, typename T, class Getter>
         PREONMATH_FORCEINLINE void setValues(matrix_simd<M, N, T>* out, const Getter& func)
         {
             setValues(out, func(0), func(1), func(2), func(3));
         }
 
-        template<size_t M, size_t N, typename T, class Getter>
+        template<PrMathSize M, PrMathSize N, typename T, class Getter>
         PREONMATH_FORCEINLINE void setValues(matrix_simd<M, N, T>* out, const Getter& func, uint32_t numElements, const matrix<M, N, T>& fillValue)
         {
             setValues(out, func(0), (numElements > 1) ? func(1) : fillValue, (numElements > 2) ? func(2) : fillValue, (numElements > 3) ? func(3) : fillValue);
         }
 
-        template<size_t M, size_t N, typename T>
+        template<PrMathSize M, PrMathSize N, typename T>
         PREONMATH_FORCEINLINE matrix<M, N, T> hSum(const matrix_simd<M, N, T>& m)
         {
             matrix<M, N, T> out;
-            for (size_t c = 0; c < N; c++)
-                for (size_t r = 0; r < M; r++)
+            for (PrMathSize c = 0; c < N; c++)
+                for (PrMathSize r = 0; r < M; r++)
                     out(r, c) = hSum(m(r, c));
             return out;
         }
@@ -58,12 +58,12 @@ namespace Math
         // the same as the ones from the given matrix class. This is not the case
         // for the function above since it takes non-simd and the matrix has simd
         //  as last template argument.
-        template<size_t M, size_t N>
+        template<PrMathSize M, PrMathSize N>
         PREONMATH_FORCEINLINE matrix<M, N, float> hSum(const matrix<M, N, float_simd>& m)
         {
             return hSum<M, N, float>(m);
         }
-        template<size_t M, size_t N>
+        template<PrMathSize M, PrMathSize N>
         PREONMATH_FORCEINLINE matrix<M, N, double> hSum(const matrix<M, N, double_simd>& m)
         {
             return hSum<M, N, double>(m);

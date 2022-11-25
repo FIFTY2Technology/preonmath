@@ -4,13 +4,17 @@
 
 #pragma once
 
-#include "scalar_simd.h"
-#include "vec_simd.h"
-#include "vec3.h"
-#include "matrix33.h"
-#include "matrix_simd.h"
+#include "compile_helper.h"
 
-#include <type_traits>
+#ifdef PREONMATH_ENABLE_SIMD
+
+    #include "scalar_simd.h"
+    #include "vec_simd.h"
+    #include "vec3.h"
+    #include "matrix33.h"
+    #include "matrix_simd.h"
+
+    #include <type_traits>
 
 namespace Preon
 {
@@ -261,12 +265,12 @@ namespace Math
         inline float choose(const bool mask, const float v1, const float v2) { return mask ? v1 : v2; }
         inline float_simd choose(const float_simd mask, const float_simd v1, const float_simd v2) { return Simd::choose(mask, v1, v2); }
 
-        template<size_t D>
+        template<PrMathSize D>
         inline vec<D, float> choose(const bool mask, const vec<D, float>& v1, const vec<D, float>& v2)
         {
             return mask ? v1 : v2;
         }
-        template<size_t D>
+        template<PrMathSize D>
         inline vec<D, float_simd> choose(const float_simd mask, const vec<D, float_simd>& v1, const vec<D, float_simd>& v2)
         {
             return vec_simd<D>::choose(mask, v1, v2);
@@ -309,3 +313,5 @@ namespace Math
     }  // namespace SimdWrapper
 }  // namespace Math
 }  // namespace Preon
+
+#endif

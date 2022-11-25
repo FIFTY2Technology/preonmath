@@ -6,16 +6,18 @@
 
 #include "compile_helper.h"
 
-#include "basics.h"
+#ifdef PREONMATH_ENABLE_SIMD
 
-#ifdef PREONMATH_COMPILER_MSVC
-    #include <intrin.h>
-#else  // GCC and Clang
-    #include <pmmintrin.h>
-    #include <smmintrin.h>
-#endif  // COMPILER
+    #include "basics.h"
 
-#include <type_traits>
+    #ifdef PREONMATH_COMPILER_MSVC
+        #include <intrin.h>
+    #else  // GCC and Clang
+        #include <pmmintrin.h>
+        #include <smmintrin.h>
+    #endif  // COMPILER
+
+    #include <type_traits>
 
 namespace Preon
 {
@@ -199,7 +201,7 @@ namespace Math
 }  // namespace Math
 }  // namespace Preon
 
-#ifdef PREONMATH_COMPILER_MSVC  // Operators are already defined on gcc / clang
+    #ifdef PREONMATH_COMPILER_MSVC  // Operators are already defined on gcc / clang
 PREONMATH_FORCEINLINE Preon::Math::float_simd operator+(Preon::Math::float_simd a, Preon::Math::float_simd b)
 {
     return _mm_add_ps(a, b);
@@ -323,4 +325,6 @@ PREONMATH_FORCEINLINE Preon::Math::double_simd operator-(Preon::Math::double_sim
 {
     return Preon::Math::Simd::xor_mask(a, Preon::Math::Simd::make<double>(-0.0));
 }
-#endif  // PREONMATH_COMPILER_MSVC
+    #endif  // PREONMATH_COMPILER_MSVC
+
+#endif

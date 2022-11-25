@@ -16,7 +16,9 @@ namespace Math
     // Matrix 2x2
     typedef matrix<2, 2, float> matrix22f;
     typedef matrix<2, 2, double> matrix22d;
+#ifdef PREONMATH_ENABLE_SIMD
     typedef matrix<2, 2, float_simd> matrix22_Simd;
+#endif
 }  // namespace Math
 }  // namespace Preon
 

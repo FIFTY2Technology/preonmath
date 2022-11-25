@@ -103,7 +103,7 @@ namespace Math
             float squaredDist = 0;
 
             // Go over all three dimensions.
-            for (size_t d = 0; d < 3; ++d)
+            for (PrMathSize d = 0; d < 3; ++d)
             {
                 if (point[d] < aabbMin[d])
                 {

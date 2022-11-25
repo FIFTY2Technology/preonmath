@@ -6,16 +6,20 @@
 
 #include "compile_helper.h"
 
+#ifdef PREONMATH_ENABLE_SIMD
+
 // Unfortunately, AVX seems to offer no benefit for us at the moment.
 // #define USE_AVX
 
-#ifdef USE_AVX
-    #include "scalar_avx.h"
-#else
-    #include "scalar_sse.h"
-#endif
+    #ifdef USE_AVX
+        #include "scalar_avx.h"
+    #else
+        #include "scalar_sse.h"
+    #endif
 
-#include <algorithm>
+    #include <algorithm>
+
+#endif
 
 namespace Preon
 {
@@ -26,6 +30,8 @@ namespace Math
     {
         static const bool value = false;
     };
+
+#ifdef PREONMATH_ENABLE_SIMD
     template<>
     struct is_simd_scalar<float_simd>
     {
@@ -36,6 +42,7 @@ namespace Math
     {
         static const bool value = true;
     };
+#endif
 
     template<typename T, typename E>
     using enable_if_simd = typename std::enable_if<is_simd_scalar<T>::value, E>::type;
@@ -45,6 +52,15 @@ namespace Math
 
     namespace Simd
     {
+        //! scalar_cast converts a non-SIMD scalar (float, double) to type T.
+        //! If T is a scalar type, nothing will happen, but if T is a SIMD type, the scalar will be written to all slots of the SIMD register.
+        template<typename A, typename B>
+        PREONMATH_FORCEINLINE static B scalar_cast(enable_if_non_simd<B, A> in)
+        {
+            return static_cast<B>(in);
+        }
+
+#ifdef PREONMATH_ENABLE_SIMD
         template<typename T>
         struct Scalar
         {
@@ -60,13 +76,6 @@ namespace Math
             using type = double;
         };
 
-        //! scalar_cast converts a non-SIMD scalar (float, double) to type T.
-        //! If T is a scalar type, nothing will happen, but if T is a SIMD type, the scalar will be written to all slots of the SIMD register.
-        template<typename A, typename B>
-        PREONMATH_FORCEINLINE static B scalar_cast(enable_if_non_simd<B, A> in)
-        {
-            return static_cast<B>(in);
-        }
         template<typename A, typename B>
         PREONMATH_FORCEINLINE static B scalar_cast(enable_if_simd<B, A> in)
         {
@@ -103,6 +112,7 @@ namespace Math
         {
             return (size >> Register<T>::expo) << Register<T>::expo;
         }
+#endif
     }  // namespace Simd
 }  // namespace Math
 }  // namespace Preon

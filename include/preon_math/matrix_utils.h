@@ -21,7 +21,7 @@ namespace Math
         //! expresses the a cross product.
         //! See: https://en.wikipedia.org/wiki/Cross_product#Conversion_to_matrix_multiplication
         template<typename Scalar>
-        matrix<3, 3, Scalar> crossProductMatrix(const vec<3, Scalar>& v)
+        PREONMATH_DEVICE matrix<3, 3, Scalar> crossProductMatrix(const vec<3, Scalar>& v)
         {
             matrix<3, 3, Scalar> r = matrix<3, 3, Scalar>::zero();
             r(0, 1) = -v(2);
@@ -33,22 +33,22 @@ namespace Math
             return r;
         }
 
-        template<typename T, size_t M, size_t N, typename T_Mat, typename T_Vec>
-        inline matrix<M, N, T> scaleColumns(const vec<M, T_Vec>& v, const matrix<M, N, T_Mat>& m)
+        template<typename T, PrMathSize M, PrMathSize N, typename T_Mat, typename T_Vec>
+        PREONMATH_DEVICE inline matrix<M, N, T> scaleColumns(const vec<M, T_Vec>& v, const matrix<M, N, T_Mat>& m)
         {
             matrix<M, N, T> out;
-            for (size_t c = 0; c < M; c++)
+            for (PrMathSize c = 0; c < M; c++)
                 out.setColumn(c, m.column(c) * v[c]);
             return out;
         }
-        template<size_t M, size_t N, typename T>
-        inline matrix<M, N, T> scaleColumns(const vec<M, T>& v, const matrix<M, N, T>& m)
+        template<PrMathSize M, PrMathSize N, typename T>
+        PREONMATH_DEVICE inline matrix<M, N, T> scaleColumns(const vec<M, T>& v, const matrix<M, N, T>& m)
         {
             return scaleColumns<T, M, N, T, T>(v, m);
         }
 
         template<typename Scalar>
-        matrix<4, 4, Scalar> makeOrtho(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar nearPlane, Scalar farPlane)
+        PREONMATH_DEVICE matrix<4, 4, Scalar> makeOrtho(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar nearPlane, Scalar farPlane)
         {
             // Bail out if the projection volume is zero-sized.
             if (left == right || bottom == top || nearPlane == farPlane)
@@ -82,7 +82,7 @@ namespace Math
         }
 
         template<typename Scalar>
-        matrix<4, 4, Scalar> makeFrustum(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar nearPlane, Scalar farPlane)
+        PREONMATH_DEVICE matrix<4, 4, Scalar> makeFrustum(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar nearPlane, Scalar farPlane)
         {
             // Bail out if the projection volume is zero-sized.
             if (left == right || bottom == top || nearPlane == farPlane)
@@ -115,7 +115,7 @@ namespace Math
         }
 
         template<typename Scalar>
-        void translate(matrix<4, 4, Scalar>* pMatrix, const vec<3, Scalar>& v)
+        PREONMATH_DEVICE void translate(matrix<4, 4, Scalar>* pMatrix, const vec<3, Scalar>& v)
         {
             vec<4, Scalar> v4(v.x(), v.y(), v.z(), 0.0);
             matrix<4, 4, Scalar>& m = *pMatrix;
@@ -126,7 +126,7 @@ namespace Math
         }
 
         template<typename Scalar>
-        matrix<4, 4, Scalar> makeTranslation(const vec<3, Scalar>& v)
+        PREONMATH_DEVICE matrix<4, 4, Scalar> makeTranslation(const vec<3, Scalar>& v)
         {
             matrix<4, 4, Scalar> m = matrix<4, 4, Scalar>::identity();
             translate(&m, v);
@@ -134,7 +134,7 @@ namespace Math
         }
 
         template<typename Scalar>
-        matrix<4, 4, Scalar> makeRotation(const quat<Scalar>& quaternion)
+        PREONMATH_DEVICE matrix<4, 4, Scalar> makeRotation(const quat<Scalar>& quaternion)
         {
             // See http://www.j3d.org/matrix_faq/matrfaq_latest.html#Q54
             matrix<4, 4, Scalar> m = matrix<4, 4, Scalar>::zero();
@@ -169,7 +169,7 @@ namespace Math
         }
 
         template<typename Scalar>
-        void rotate(matrix<4, 4, Scalar>* pMatrix, Scalar angle, Scalar x, Scalar y, Scalar z)
+        PREONMATH_DEVICE void rotate(matrix<4, 4, Scalar>* pMatrix, Scalar angle, Scalar x, Scalar y, Scalar z)
         {
             if (angle == 0.0)
                 return;
@@ -295,13 +295,13 @@ namespace Math
         }
 
         template<typename Scalar>
-        void rotate(matrix<4, 4, Scalar>* pMatrix, Scalar angle, const vec<3, Scalar>& vector)
+        PREONMATH_DEVICE void rotate(matrix<4, 4, Scalar>* pMatrix, Scalar angle, const vec<3, Scalar>& vector)
         {
             rotate(pMatrix, angle, vector.x(), vector.y(), vector.z());
         }
 
         template<typename Scalar>
-        matrix<4, 4, Scalar> makeRotation(Scalar angle, const vec<3, Scalar>& vector)
+        PREONMATH_DEVICE matrix<4, 4, Scalar> makeRotation(Scalar angle, const vec<3, Scalar>& vector)
         {
             matrix<4, 4, Scalar> m = matrix<4, 4, Scalar>::identity();
             rotate(&m, angle, vector.x(), vector.y(), vector.z());
@@ -309,7 +309,7 @@ namespace Math
         }
 
         template<typename Scalar>
-        void scale(matrix<4, 4, Scalar>* pMatrix, const vec<3, Scalar>& v)
+        PREONMATH_DEVICE void scale(matrix<4, 4, Scalar>* pMatrix, const vec<3, Scalar>& v)
         {
             (*pMatrix)(0, 0) *= v.x();
             (*pMatrix)(1, 0) *= v.x();
@@ -326,7 +326,7 @@ namespace Math
         }
 
         template<typename Scalar>
-        matrix<4, 4, Scalar> makeScale(const vec<3, Scalar>& v)
+        PREONMATH_DEVICE matrix<4, 4, Scalar> makeScale(const vec<3, Scalar>& v)
         {
             matrix<4, 4, Scalar> m = matrix<4, 4, Scalar>::identity();
             scale(&m, v);
@@ -334,7 +334,7 @@ namespace Math
         }
 
         template<typename Scalar>
-        matrix<4, 4, Scalar> worldTransform(const vec<3, Scalar>& position, const quat<Scalar>& orientation, const vec<3, Scalar>& scaleVector)
+        PREONMATH_DEVICE matrix<4, 4, Scalar> worldTransform(const vec<3, Scalar>& position, const quat<Scalar>& orientation, const vec<3, Scalar>& scaleVector)
         {
             // Build the world transformation.
             // First position.
@@ -347,8 +347,7 @@ namespace Math
         }
 
         template<typename Scalar>
-        matrix<4, 4, Scalar>
-        worldTransform(const vec<3, Scalar>& position, const quat<Scalar>& orientation, const vec<3, Scalar>& scaleVector, const vec<3, Scalar>& pivot, bool applyScaleOnPivot)
+        matrix<4, 4, Scalar> PREONMATH_DEVICE worldTransform(const vec<3, Scalar>& position, const quat<Scalar>& orientation, const vec<3, Scalar>& scaleVector, const vec<3, Scalar>& pivot, bool applyScaleOnPivot)
         {
             // Build the world transformation.
             matrix<4, 4, Scalar> m = makeTranslation(position);  // Position first.
@@ -368,7 +367,7 @@ namespace Math
         }
 
         template<typename Scalar>
-        matrix<3, 3, Scalar> fromQuaternion(const quat<Scalar>& quaternion)
+        PREONMATH_DEVICE matrix<3, 3, Scalar> fromQuaternion(const quat<Scalar>& quaternion)
         {
             // See http://www.j3d.org/matrix_faq/matrfaq_latest.html#Q54
             Scalar xx = quaternion.x() * quaternion.x();
@@ -400,8 +399,9 @@ namespace Math
             return m;
         }
 
+#ifdef PREONMATH_ENABLE_SIMD
         template<typename Scalar>
-        enable_if_non_simd<Scalar, bool> computeMaxEigenValue(const matrix<3, 3, Scalar>& m, Scalar& eigenMax, vec<3, Scalar>& eigenVector)
+        PREONMATH_DEVICE enable_if_non_simd<Scalar, bool> computeMaxEigenValue(const matrix<3, 3, Scalar>& m, Scalar& eigenMax, vec<3, Scalar>& eigenVector)
         {
             eigenVector = m.diagonal();
             eigenMax = eigenVector.length();
@@ -420,7 +420,7 @@ namespace Math
             }
             return true;
         }
-        inline void computeMaxEigenValue(const matrix<3, 3, float_simd>& m, float_simd& eigenMax, vec_simd<3>& eigenVector)
+        PREONMATH_DEVICE inline void computeMaxEigenValue(const matrix<3, 3, float_simd>& m, float_simd& eigenMax, vec_simd<3>& eigenVector)
         {
             eigenVector = m.diagonal();
             eigenMax = eigenVector.length();
@@ -432,7 +432,7 @@ namespace Math
                 eigenVector = Simd::and_mask(eigenVector / eigenMax, eigenMax > zero);
             }
         }
-        inline void computeMaxEigenValue_Adaptive(const matrix<3, 3, float_simd>& m, float_simd& eigenMax, vec_simd<3>& eigenVector)
+        PREONMATH_DEVICE inline void computeMaxEigenValue_Adaptive(const matrix<3, 3, float_simd>& m, float_simd& eigenMax, vec_simd<3>& eigenVector)
         {
             eigenVector = m.diagonal();
             eigenMax = eigenVector.length();
@@ -451,9 +451,10 @@ namespace Math
                 prevLength = eigenMax;
             }
         }
+#endif
 
         template<typename Scalar>
-        void jacobiRotate(matrix<3, 3, Scalar>* pMatrix, matrix<3, 3, Scalar>* R, int p, int q)
+        PREONMATH_DEVICE void jacobiRotate(matrix<3, 3, Scalar>* pMatrix, matrix<3, 3, Scalar>* R, int p, int q)
         {
             // rotates A through phi in pq-plane to set A.get(p, q) = 0
             // rotation stored in R whose columns are eigenvectors of A
@@ -489,7 +490,7 @@ namespace Math
         }
 
         template<typename Scalar>
-        void eigenDecomposition(matrix<3, 3, Scalar>* pMatrix, matrix<3, 3, Scalar>* R, float jacobiEpsilon = 1e-15f, int jacobiIterations = 100)
+        PREONMATH_DEVICE void eigenDecomposition(matrix<3, 3, Scalar>* pMatrix, matrix<3, 3, Scalar>* R, float jacobiEpsilon = 1e-15f, int jacobiIterations = 100)
         {
             // only for symmetric matrices!
             // A = R A' R^T, where A' is diagonal and R orthonormal
@@ -524,18 +525,18 @@ namespace Math
             }
         }
 
-        template<size_t N, size_t M, typename T>
-        bool isZero(const matrix<N, M, T>& m)
+        template<PrMathSize N, PrMathSize M, typename T>
+        PREONMATH_DEVICE bool isZero(const matrix<N, M, T>& m)
         {
-            for (size_t c = 0; c < N; c++)
-                for (size_t r = 0; r < M; r++)
+            for (PrMathSize c = 0; c < N; c++)
+                for (PrMathSize r = 0; r < M; r++)
                     if (!IsZero(m(r, c)))
                         return false;
             return true;
         }
 
         template<typename Scalar>
-        vec<3, Scalar> mapVector(const matrix<4, 4, Scalar>& m, const vec<3, Scalar>& v)
+        PREONMATH_DEVICE vec<3, Scalar> mapVector(const matrix<4, 4, Scalar>& m, const vec<3, Scalar>& v)
         {
             vec<4, Scalar> v4(v[0], v[1], v[2], 0.0);
             v4 = m * v4;
@@ -543,16 +544,16 @@ namespace Math
         }
 
         //! Inverts the MSub x MSub upper-left sub matrix of the given M x N matrix using doubles and returns the result. Returns a MSub x MSub matrix (by default MxM).
-        template<size_t M, size_t N, typename Scalar, size_t MSub = M>
-        typename std::enable_if<MSub <= M && MSub <= N, matrix<MSub, MSub, Scalar>>::type invertHighPrecision(const matrix<M, N, Scalar>& m)
+        template<PrMathSize M, PrMathSize N, typename Scalar, PrMathSize MSub = M>
+        PREONMATH_DEVICE typename std::enable_if<MSub <= M && MSub <= N, matrix<MSub, MSub, Scalar>>::type invertHighPrecision(const matrix<M, N, Scalar>& m)
         {
-            auto doubleInverted = matrix<MSub, MSub, double>([&](size_t r, size_t c) { return static_cast<double>(m(r, c)); }).inverted();
-            return matrix<MSub, MSub, Scalar>([&](size_t r, size_t c) { return static_cast<Scalar>(doubleInverted(r, c)); });
+            auto doubleInverted = matrix<MSub, MSub, double>([&](PrMathSize r, PrMathSize c) { return static_cast<double>(m(r, c)); }).inverted();
+            return matrix<MSub, MSub, Scalar>([&](PrMathSize r, PrMathSize c) { return static_cast<Scalar>(doubleInverted(r, c)); });
         }
 
         //! Computes the 3x3 normal matrix given a 4x4 world matrix.
         template<typename Scalar>
-        matrix<3, 3, Scalar> makeNormalMatrix(const matrix<4, 4, Scalar>& worldTransform)
+        PREONMATH_DEVICE matrix<3, 3, Scalar> makeNormalMatrix(const matrix<4, 4, Scalar>& worldTransform)
         {
             // We need the inverted transpose to transform the normals.
             // Reference: http://gamedev.stackexchange.com/questions/44511/how-to-transform-mesh-components
@@ -563,20 +564,20 @@ namespace Math
         //! Extracts the 3x3 rotation matrix given a 4x4 transform matrix.
         //! Attention: The result is only valid if no shear or stress is part of the transform, i.e., the matrix may contain translation, rotation and scale.
         template<typename Scalar>
-        matrix<3, 3, Scalar> extractRotationMatrix(const matrix<4, 4, Scalar>& transform)
+        PREONMATH_DEVICE matrix<3, 3, Scalar> extractRotationMatrix(const matrix<4, 4, Scalar>& transform)
         {
             // Compute scale.
-            vec3f scale(transform.column(0).length(), transform.column(1).length(), transform.column(2).length());
+            vec<3, Scalar> scale(transform.column(0).length(), transform.column(1).length(), transform.column(2).length());
             matrix<3, 3, Scalar> rot;
-            for (size_t i = 0; i < 3; i++)
-                for (size_t j = 0; j < 3; j++)
+            for (PrMathSize i = 0; i < 3; i++)
+                for (PrMathSize j = 0; j < 3; j++)
                     rot(i, j) = IsZero(scale[i]) ? transform(i, j) : transform(i, j) / scale[i];
             return rot;
         }
     }  // namespace MatrixUtils
 
     template<typename OutV, typename InM, typename InV>
-    inline vec<3, OutV> operator*(const matrix<4, 4, InM>& m, const vec<3, InV>& v)
+    PREONMATH_DEVICE inline vec<3, OutV> operator*(const matrix<4, 4, InM>& m, const vec<3, InV>& v)
     {
         vec<4, InV> v4(v[0], v[1], v[2], 1.0);
         v4 = operator*<InV>(m, v4);
@@ -585,7 +586,7 @@ namespace Math
     }
 
     template<typename T>
-    inline vec<3, T> operator*(const matrix<4, 4, T>& m, const vec<3, T>& v)
+    PREONMATH_DEVICE inline vec<3, T> operator*(const matrix<4, 4, T>& m, const vec<3, T>& v)
     {
         return operator*<T, T, T>(m, v);
     }

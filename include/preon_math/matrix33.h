@@ -16,7 +16,9 @@ namespace Math
     // Matrix 3x3
     typedef matrix<3, 3, float> matrix33f;
     typedef matrix<3, 3, double> matrix33d;
+#ifdef PREONMATH_ENABLE_SIMD
     typedef matrix<3, 3, float_simd> matrix33_Simd;
+#endif
 }  // namespace Math
 }  // namespace Preon
 

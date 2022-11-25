@@ -28,6 +28,12 @@ namespace Math
         SymmetricMatrix33(const matrix<3, 3, T>& m)
             : SymmetricMatrix33(m(0, 0), m(0, 1), m(0, 2), m(1, 1), m(1, 2), m(2, 2)) {}
 
+        template<typename Lambda>
+        SymmetricMatrix33(const Lambda& f)
+            : m_Data(f)
+        {
+        }
+
         static SymmetricMatrix33 identity() { return SymmetricMatrix33(1.0, 0.0, 0.0, 1.0, 0.0, 1.0); }
 
         static SymmetricMatrix33 fromSumWithTranspose(const matrix<3, 3, T>& m)
@@ -36,14 +42,16 @@ namespace Math
         }
 
         // Data access
-        T operator[](size_t i) const { return m_Data[i]; }
-        T& operator[](size_t i) { return m_Data[i]; }
+        T operator[](PrMathSize i) const { return m_Data[i]; }
+        T& operator[](PrMathSize i) { return m_Data[i]; }
 
-        T operator()(size_t row, size_t column) const { return element(row, column); }
-        T& operator()(size_t row, size_t column) { return element(row, column); }
+        T operator()(PrMathSize row, PrMathSize column) const { return element(row, column); }
+        T& operator()(PrMathSize row, PrMathSize column) { return element(row, column); }
 
-        T element(size_t row, size_t column) const { return (row == 0 || column == 0) ? m_Data[row + column] : m_Data[row + column + 1]; }
-        T& element(size_t row, size_t column) { return (row == 0 || column == 0) ? m_Data[row + column] : m_Data[row + column + 1]; }
+        T element(PrMathSize row, PrMathSize column) const { return (row == 0 || column == 0) ? m_Data[row + column] : m_Data[row + column + 1]; }
+        T& element(PrMathSize row, PrMathSize column) { return (row == 0 || column == 0) ? m_Data[row + column] : m_Data[row + column + 1]; }
+
+        const std::array<T, 6>& data() const { return m_Data.data(); }
 
         void addDiagonalMatrix(const vec<3, T>& diagonal)
         {
@@ -87,7 +95,7 @@ namespace Math
     template<typename T>
     inline bool operator==(const SymmetricMatrix33<T>& m1, const SymmetricMatrix33<T>& m2)
     {
-        for (size_t i = 0; i < 6; ++i)
+        for (PrMathSize i = 0; i < 6; ++i)
             if (m1[i] != m2[i])
                 return false;
         return true;
@@ -112,7 +120,7 @@ namespace Math
         return stream;
     }
 
-    template<size_t M, size_t N, typename T>
+    template<PrMathSize M, PrMathSize N, typename T>
     inline std::ostream& operator<<(std::ostream& ostream, const SymmetricMatrix33<T>& symmetricMatrix)
     {
         std::stringstream ss;

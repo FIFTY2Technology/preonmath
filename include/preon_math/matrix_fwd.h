@@ -7,13 +7,13 @@
 #include "compile_helper.h"
 #include "scalar_simd.h"
 
-#include <cstddef>  // For size_t
+#include <cstddef>  // For PrMathSize
 
 namespace Preon
 {
 namespace Math
 {
-    template<std::size_t M, std::size_t N, typename T>
+    template<PrMathSize M, PrMathSize N, typename T>
     class matrix;
     // Matrix 3x3
     typedef matrix<3, 3, float> matrix33f;

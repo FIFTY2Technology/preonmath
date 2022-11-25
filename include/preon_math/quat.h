@@ -22,53 +22,53 @@ namespace Math
     class quat
     {
     public:
-        quat()
+        PREONMATH_DEVICE quat()
             : m_W(1), m_X(0), m_Y(0), m_Z(0) {}
-        quat(Real scalar, Real xpos, Real ypos, Real zpos)
+        PREONMATH_DEVICE quat(Real scalar, Real xpos, Real ypos, Real zpos)
             : m_W(scalar), m_X(xpos), m_Y(ypos), m_Z(zpos) {}
-        quat(Real scalar, const vec<3, Real>& vector)
+        PREONMATH_DEVICE quat(Real scalar, const vec<3, Real>& vector)
             : m_W(scalar), m_X(vector.x()), m_Y(vector.y()), m_Z(vector.z()) {}
-        explicit quat(const vec<4, Real>& vector)
+        PREONMATH_DEVICE explicit quat(const vec<4, Real>& vector)
             : m_W(vector.w()), m_X(vector.x()), m_Y(vector.y()), m_Z(vector.z()) {}
         template<typename Real2>
-        explicit quat(const quat<Real2>& q)
+        PREONMATH_DEVICE explicit quat(const quat<Real2>& q)
             : m_W((Real)q.scalar()), m_X((Real)q.x()), m_Y((Real)q.y()), m_Z((Real)q.z())
         {
         }
 
         //! Returns the zero-rotation quaternion.
-        static quat<Real> identity() { return quat<Real>(1, 0, 0, 0); }
+        PREONMATH_DEVICE static quat<Real> identity() { return quat<Real>(1, 0, 0, 0); }
 
-        vec<3, Real> toVector3() const { return vec<3, Real>(m_X, m_Y, m_Z); }
-        void setVector(const vec<3, Real>& vector) { setVector(vector.x(), vector.y(), vector.z()); }
-        inline void setVector(Real x, Real y, Real z)
+        PREONMATH_DEVICE vec<3, Real> toVector3() const { return vec<3, Real>(m_X, m_Y, m_Z); }
+        PREONMATH_DEVICE void setVector(const vec<3, Real>& vector) { setVector(vector.x(), vector.y(), vector.z()); }
+        PREONMATH_DEVICE inline void setVector(Real x, Real y, Real z)
         {
             m_X = x;
             m_Y = y;
             m_Z = z;
         }
 
-        vec<4, Real> toVector4() const { return vec<4, Real>(m_X, m_Y, m_Z, m_W); }
+        PREONMATH_DEVICE vec<4, Real> toVector4() const { return vec<4, Real>(m_X, m_Y, m_Z, m_W); }
 
-        Real x() const { return m_X; }
-        Real y() const { return m_Y; }
-        Real z() const { return m_Z; }
-        Real scalar() const { return m_W; }
+        PREONMATH_DEVICE Real x() const { return m_X; }
+        PREONMATH_DEVICE Real y() const { return m_Y; }
+        PREONMATH_DEVICE Real z() const { return m_Z; }
+        PREONMATH_DEVICE Real scalar() const { return m_W; }
 
-        Real& x() { return m_X; }
-        Real& y() { return m_Y; }
-        Real& z() { return m_Z; }
-        Real& scalar() { return m_W; }
+        PREONMATH_DEVICE Real& x() { return m_X; }
+        PREONMATH_DEVICE Real& y() { return m_Y; }
+        PREONMATH_DEVICE Real& z() { return m_Z; }
+        PREONMATH_DEVICE Real& scalar() { return m_W; }
 
-        void setX(Real x) { m_X = x; }
-        void setY(Real y) { m_Y = y; }
-        void setZ(Real z) { m_Z = z; }
-        void setScalar(Real scalar) { m_W = scalar; }
+        PREONMATH_DEVICE void setX(Real x) { m_X = x; }
+        PREONMATH_DEVICE void setY(Real y) { m_Y = y; }
+        PREONMATH_DEVICE void setZ(Real z) { m_Z = z; }
+        PREONMATH_DEVICE void setScalar(Real scalar) { m_W = scalar; }
 
-        Real lengthSquared() const { return m_X * m_X + m_Y * m_Y + m_Z * m_Z + m_W * m_W; }
-        Real length() const { return std::sqrt(lengthSquared()); }
+        PREONMATH_DEVICE Real lengthSquared() const { return m_X * m_X + m_Y * m_Y + m_Z * m_Z + m_W * m_W; }
+        PREONMATH_DEVICE Real length() const { return std::sqrt(lengthSquared()); }
 
-        void normalize()
+        PREONMATH_DEVICE void normalize()
         {
             // Need some extra precision if the length is very small.
             Real len = length();
@@ -77,7 +77,7 @@ namespace Math
                 return;
             *this /= len;
         }
-        quat<Real> normalized() const
+        PREONMATH_DEVICE quat<Real> normalized() const
         {
             quat<Real> out = *this;
             out.normalize();
@@ -85,19 +85,19 @@ namespace Math
         }
 
         inline quat<Real> conjugate() const { return quat<Real>(m_W, -m_X, -m_Y, -m_Z); }
-        quat<Real> inverse() const { return conjugate() / length(); }
+        PREONMATH_DEVICE quat<Real> inverse() const { return conjugate() / length(); }
 
         template<typename T_Out, typename T_Vec>
-        vec<3, T_Out> rotatedVector(const vec<3, T_Vec>& vector) const
+        PREONMATH_DEVICE vec<3, T_Out> rotatedVector(const vec<3, T_Vec>& vector) const
         {
             return operator*<T_Out, T_Out, Real>(operator*<T_Out, Real, T_Vec>(*this, quat<T_Vec>(0, vector)), conjugate()).toVector3();
         }
 
-        vec<3, Real> rotatedVector(const vec<3, Real>& vector) const { return rotatedVector<Real, Real>(vector); }
+        PREONMATH_DEVICE vec<3, Real> rotatedVector(const vec<3, Real>& vector) const { return rotatedVector<Real, Real>(vector); }
 
         //! Returns the quaternion that transformed the direction from into the direction to. Both from and to must be normalized directions.
         template<typename T_Vec>
-        static quat<Real> rotationBetween_nothrow(const vec<3, Real>& from, const vec<3, T_Vec>& to, double minCrossProductLength = 0.0001)
+        PREONMATH_DEVICE static quat<Real> rotationBetween_nothrow(const vec<3, Real>& from, const vec<3, T_Vec>& to, double minCrossProductLength = 0.0001)
         {
             // the only purpose of this clamping is to deal with Realing point rounding errors. We expect that from and to are normalized.
             Real angle = std::acos(MathUtils::clamp(vec<3, Real>::template dotProduct<Real, T_Vec>(from, to), Real{-1}, Real{1}));
@@ -117,7 +117,7 @@ namespace Math
 
         //! Returns the quaternion that transformed the direction from into the direction to. Both from and to must be normalized directions.
         template<typename T_in = Real>
-        static quat<Real> rotationBetween(const vec<3, Real>& from, const vec<3, T_in>& to, double minCrossProductLength = 0.0001)
+        PREONMATH_DEVICE static quat<Real> rotationBetween(const vec<3, Real>& from, const vec<3, T_in>& to, double minCrossProductLength = 0.0001)
         {
             THROW_EXCEPTION(!AreEqual(Real(1), from.lengthSquared()), "from is not normalized!")
             THROW_EXCEPTION(!AreEqual(T_in(1), to.lengthSquared()), "to is not normalized!")
@@ -125,7 +125,7 @@ namespace Math
             return rotationBetween_nothrow(from, to, minCrossProductLength);
         }
 
-        quat<Real>& operator+=(const quat<Real>& quat)
+        PREONMATH_DEVICE quat<Real>& operator+=(const quat<Real>& quat)
         {
             m_X += quat.m_X;
             m_Y += quat.m_Y;
@@ -133,7 +133,7 @@ namespace Math
             m_W += quat.m_W;
             return *this;
         }
-        quat<Real>& operator-=(const quat<Real>& quat)
+        PREONMATH_DEVICE quat<Real>& operator-=(const quat<Real>& quat)
         {
             m_X -= quat.m_X;
             m_Y -= quat.m_Y;
@@ -141,7 +141,7 @@ namespace Math
             m_W -= quat.m_W;
             return *this;
         }
-        quat<Real>& operator*=(Real factor)
+        PREONMATH_DEVICE quat<Real>& operator*=(Real factor)
         {
             m_X *= factor;
             m_Y *= factor;
@@ -149,7 +149,7 @@ namespace Math
             m_W *= factor;
             return *this;
         }
-        quat<Real>& operator/=(Real divisor)
+        PREONMATH_DEVICE quat<Real>& operator/=(Real divisor)
         {
             m_X /= divisor;
             m_Y /= divisor;
@@ -158,9 +158,9 @@ namespace Math
             return *this;
         }
 
-        static quat<Real> fromAxisAndAngle(const vec<3, Real>& axis, Real angle) { return fromAxisAndAngleRad(axis, DegToRad(angle)); }
+        PREONMATH_DEVICE static quat<Real> fromAxisAndAngle(const vec<3, Real>& axis, Real angle) { return fromAxisAndAngleRad(axis, DegToRad(angle)); }
 
-        static quat<Real> fromAxisAndAngleRad(const vec<3, Real>& axis, Real angle)
+        PREONMATH_DEVICE static quat<Real> fromAxisAndAngleRad(const vec<3, Real>& axis, Real angle)
         {
             // See http://www.j3d.org/matrix_faq/matrfaq_latest.html#Q56
             // We normalize the result just in case the values are close
@@ -172,7 +172,7 @@ namespace Math
             return quat<Real>(c, axisNormalized[0] * s, axisNormalized[1] * s, axisNormalized[2] * s).normalized();
         }
 
-        void toAxisAndAngle(vec<3, Real>* axis, Real* angle)
+        PREONMATH_DEVICE void toAxisAndAngle(vec<3, Real>* axis, Real* angle)
         {
             // Normalize just to be sure.
             normalize();
@@ -195,7 +195,7 @@ namespace Math
             }
         }
 
-        static quat<Real> slerp(const quat<Real>& q1, const quat<Real>& q2, Real t)
+        PREONMATH_DEVICE static quat<Real> slerp(const quat<Real>& q1, const quat<Real>& q2, Real t)
         {
             // Handle the easy cases first.
             if (t <= 0)
@@ -236,7 +236,7 @@ namespace Math
             return q1 * factor1 + q2b * factor2;
         }
 
-        static quat<Real> nlerp(const quat<Real>& q1, const quat<Real>& q2, Real t)
+        PREONMATH_DEVICE static quat<Real> nlerp(const quat<Real>& q1, const quat<Real>& q2, Real t)
         {
             // Handle the easy cases first.
             if (t <= 0)
@@ -266,7 +266,7 @@ namespace Math
     typedef quat<double> quatd;
 
     template<typename Out, typename In1, typename In2>
-    static quat<Out> operator*(const quat<In1>& q, const quat<In2>& p)
+    PREONMATH_DEVICE static quat<Out> operator*(const quat<In1>& q, const quat<In2>& p)
     {
         return quat<Out>(
             q.scalar() * p.scalar() - q.x() * p.x() - q.y() * p.y() - q.z() * p.z(),
@@ -276,55 +276,55 @@ namespace Math
     }
 
     template<typename Real>
-    inline const quat<Real> operator*(const quat<Real>& q1, const quat<Real>& q2)
+    PREONMATH_DEVICE inline const quat<Real> operator*(const quat<Real>& q1, const quat<Real>& q2)
     {
         return operator*<Real, Real, Real>(q1, q2);
     }
 
     template<typename Real>
-    inline bool operator==(const quat<Real>& q1, const quat<Real>& q2)
+    PREONMATH_DEVICE inline bool operator==(const quat<Real>& q1, const quat<Real>& q2)
     {
         return q1.x() == q2.x() && q1.y() == q2.y() && q1.z() == q2.z() && q1.scalar() == q2.scalar();
     }
 
     template<typename Real>
-    inline bool operator!=(const quat<Real>& q1, const quat<Real>& q2)
+    PREONMATH_DEVICE inline bool operator!=(const quat<Real>& q1, const quat<Real>& q2)
     {
         return q1.x() != q2.x() || q1.y() != q2.y() || q1.z() != q2.z() || q1.scalar() != q2.scalar();
     }
 
     template<typename Real>
-    inline const quat<Real> operator+(const quat<Real>& q1, const quat<Real>& q2)
+    PREONMATH_DEVICE inline const quat<Real> operator+(const quat<Real>& q1, const quat<Real>& q2)
     {
         return quat<Real>(q1.scalar() + q2.scalar(), q1.x() + q2.x(), q1.y() + q2.y(), q1.z() + q2.z());
     }
 
     template<typename Real>
-    inline const quat<Real> operator-(const quat<Real>& q1, const quat<Real>& q2)
+    PREONMATH_DEVICE inline const quat<Real> operator-(const quat<Real>& q1, const quat<Real>& q2)
     {
         return quat<Real>(q1.scalar() - q2.scalar(), q1.x() - q2.x(), q1.y() - q2.y(), q1.z() - q2.z());
     }
 
     template<typename Real>
-    inline const quat<Real> operator*(Real factor, const quat<Real>& q)
+    PREONMATH_DEVICE inline const quat<Real> operator*(Real factor, const quat<Real>& q)
     {
         return quat<Real>(q.scalar() * factor, q.x() * factor, q.y() * factor, q.z() * factor);
     }
 
     template<typename Real>
-    inline const quat<Real> operator*(const quat<Real>& q, Real factor)
+    PREONMATH_DEVICE inline const quat<Real> operator*(const quat<Real>& q, Real factor)
     {
         return factor * q;
     }
 
     template<typename Real>
-    inline const quat<Real> operator-(const quat<Real>& q)
+    PREONMATH_DEVICE inline const quat<Real> operator-(const quat<Real>& q)
     {
         return quat<Real>(-q.scalar(), -q.x(), -q.y(), -q.z());
     }
 
     template<typename Real>
-    inline const quat<Real> operator/(const quat<Real>& q, Real divisor)
+    PREONMATH_DEVICE inline const quat<Real> operator/(const quat<Real>& q, Real divisor)
     {
         return quat<Real>(q.scalar() / divisor, q.x() / divisor, q.y() / divisor, q.z() / divisor);
     }

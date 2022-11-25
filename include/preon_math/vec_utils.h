@@ -14,66 +14,66 @@ namespace Math
 {
     namespace VecUtils
     {
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         static vec<D, T> round(vec<D, T> v)
         {
-            for (size_t i = 0; i < D; i++)
+            for (PrMathSize i = 0; i < D; i++)
                 v[i] = MathUtils::round(v[i]);
             return v;
         }
 
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         static vec<D, T> floor(vec<D, T> v)
         {
-            for (size_t i = 0; i < D; i++)
+            for (PrMathSize i = 0; i < D; i++)
                 v[i] = std::floor(v[i]);
             return v;
         }
 
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         static vec<D, T> ceil(vec<D, T> v)
         {
-            for (size_t i = 0; i < D; i++)
+            for (PrMathSize i = 0; i < D; i++)
                 v[i] = std::ceil(v[i]);
             return v;
         }
 
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         static bool isNan(const vec<D, T>& v)
         {
-            for (size_t i = 0; i < D; i++)
+            for (PrMathSize i = 0; i < D; i++)
                 if (std::isnan(v[i]))
                     return true;
             return false;
         }
 
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         static matrix<D, D, T> outerProduct(const vec<D, T>& v1, const vec<D, T>& v2)
         {
-            return matrix<D, D, T>([&](size_t r, size_t c) { return v1[r] * v2[c]; });
+            return matrix<D, D, T>([&](PrMathSize r, PrMathSize c) { return v1[r] * v2[c]; });
         }
 
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         static vec<D, T> project(const vec<D, T>& v1, const vec<D, T>& v2)
         {
             return (v1 * v2) / v2.lengthSquared() * v2;
         }
 
         //! Projects the vector \arg \v into the direction pointed by \arg \n. \arg \n has to be normalized.
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         static vec<D, T> projectToDirection(const vec<D, T>& v, const vec<D, T>& n)
         {
             return (v * n) * n;
         }
 
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         static vec<D, T> reject(const vec<D, T>& v1, const vec<D, T>& v2)
         {
             return v1 - project(v1, v2);
         }
 
         //! Rejects the vector \arg \v from the direction pointed by \arg \n. \arg \n has to be normalized.
-        template<size_t D, typename T>
+        template<PrMathSize D, typename T>
         static vec<D, T> rejectFromDirection(const vec<D, T>& v, const vec<D, T>& n)
         {
             return v - projectToDirection(v, n);
