@@ -96,14 +96,14 @@ namespace Math
 
         //! Clamps the given value so that it is in range [min, max].
         template<class scalar>
-        scalar clamp(scalar x, scalar min, scalar max)
+        PREONMATH_DEVICE scalar clamp(scalar x, scalar minVal, scalar maxVal)
         {
-            return std::max(min, std::min(max, x));
+            return max(minVal, min(maxVal, x));
         }
 
         //! Clamps the given value so that it is in range [0, 1].
         template<class scalar>
-        scalar clampToZeroOne(scalar x, enable_if_non_simd<scalar, void*> = nullptr)
+        PREONMATH_DEVICE scalar clampToZeroOne(scalar x, enable_if_non_simd<scalar, void*> = nullptr)
         {
             return clamp(x, scalar{0}, scalar{1});
         }
@@ -120,14 +120,14 @@ namespace Math
 
         //! Maps x in range [xMin, xMax] linearly into the range [0, 1].
         template<typename scalar>
-        scalar mapToZeroOneIntervalLinear(scalar x, scalar xMin, scalar xMax)
+        PREONMATH_DEVICE scalar mapToZeroOneIntervalLinear(scalar x, scalar xMin, scalar xMax)
         {
             return (x - xMin) / (xMax - xMin);
         }
 
         //! Maps x in range [xMin, xMax] linearly into the range [0, 1]. Clamps the result to [0, 1] if x is not in the range [xMin, xMax].
         template<typename scalar>
-        scalar mapToZeroOneIntervalLinearClamped(scalar x, scalar xMin, scalar xMax)
+        PREONMATH_DEVICE scalar mapToZeroOneIntervalLinearClamped(scalar x, scalar xMin, scalar xMax)
         {
             return clampToZeroOne(mapToZeroOneIntervalLinear(x, xMin, xMax));
         }
@@ -157,7 +157,7 @@ namespace Math
 
         //! Converts a percentage to a factor (dividing by 100).
         template<class scalar>
-        scalar percentageToFactor(scalar x)
+        PREONMATH_DEVICE scalar percentageToFactor(scalar x)
         {
             return x * 0.01;
         }

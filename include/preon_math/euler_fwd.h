@@ -12,7 +12,7 @@ namespace Math
 {
     template<typename Real>
     class euler;
-    typedef euler<float> eulerf;
-    typedef euler<double> eulerd;
+    using eulerf = euler<float>;
+    using eulerd = euler<double>;
 }  // namespace Math
 }  // namespace Preon

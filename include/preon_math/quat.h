@@ -6,6 +6,7 @@
 
 #include "compile_helper.h"
 
+#include "quat_fwd.h"
 #include "vec.h"
 #include "math_utils.h"
 
@@ -72,7 +73,9 @@ namespace Math
         {
             // Need some extra precision if the length is very small.
             Real len = length();
+#ifndef PREONMATH_CUDA
             THROW_EXCEPTION(IsZero(len), "Cannot normalize a zero quaternion!")
+#endif
             if (AreEqual(len, static_cast<Real>(1)))  // this was in the old code, do we really need / want this check?
                 return;
             *this /= len;
@@ -84,24 +87,24 @@ namespace Math
             return out;
         }
 
-        inline quat<Real> conjugate() const { return quat<Real>(m_W, -m_X, -m_Y, -m_Z); }
+        PREONMATH_DEVICE quat<Real> conjugate() const { return quat<Real>(m_W, -m_X, -m_Y, -m_Z); }
         PREONMATH_DEVICE quat<Real> inverse() const { return conjugate() / length(); }
 
-        template<typename T_Out, typename T_Vec>
-        PREONMATH_DEVICE vec<3, T_Out> rotatedVector(const vec<3, T_Vec>& vector) const
+        template<typename T>
+        PREONMATH_DEVICE vec<3, T> rotatedVector(const vec<3, T>& vector) const
         {
-            return operator*<T_Out, T_Out, Real>(operator*<T_Out, Real, T_Vec>(*this, quat<T_Vec>(0, vector)), conjugate()).toVector3();
+            return operator*<T, T, Real>(operator*<T, Real, T>(*this, quat<T>(T(0), vector)), conjugate()).toVector3();
         }
 
-        PREONMATH_DEVICE vec<3, Real> rotatedVector(const vec<3, Real>& vector) const { return rotatedVector<Real, Real>(vector); }
+        PREONMATH_DEVICE vec<3, Real> rotatedVector(const vec<3, Real>& vector) const { return rotatedVector<Real>(vector); }
 
         //! Returns the quaternion that transformed the direction from into the direction to. Both from and to must be normalized directions.
         template<typename T_Vec>
         PREONMATH_DEVICE static quat<Real> rotationBetween_nothrow(const vec<3, Real>& from, const vec<3, T_Vec>& to, double minCrossProductLength = 0.0001)
         {
             // the only purpose of this clamping is to deal with Realing point rounding errors. We expect that from and to are normalized.
-            Real angle = std::acos(MathUtils::clamp(vec<3, Real>::template dotProduct<Real, T_Vec>(from, to), Real{-1}, Real{1}));
-            vec<3, Real> axis = vec<3, Real>::template crossProduct<Real, T_Vec>(from, to);
+            Real angle = std::acos(MathUtils::clamp(vec<3, Real>::dotProduct(from, to), Real{-1}, Real{1}));
+            vec<3, Real> axis = vec<3, Real>::crossProduct(from, to);
             Real length = axis.length();
             if (length > minCrossProductLength)
             {
@@ -119,9 +122,10 @@ namespace Math
         template<typename T_in = Real>
         PREONMATH_DEVICE static quat<Real> rotationBetween(const vec<3, Real>& from, const vec<3, T_in>& to, double minCrossProductLength = 0.0001)
         {
+#ifndef PREONMATH_CUDA
             THROW_EXCEPTION(!AreEqual(Real(1), from.lengthSquared()), "from is not normalized!")
             THROW_EXCEPTION(!AreEqual(T_in(1), to.lengthSquared()), "to is not normalized!")
-
+#endif
             return rotationBetween_nothrow(from, to, minCrossProductLength);
         }
 
@@ -261,10 +265,6 @@ namespace Math
         Real m_W, m_X, m_Y, m_Z;
     };
 
-    // Define float and double versions.
-    typedef quat<float> quatf;
-    typedef quat<double> quatd;
-
     template<typename Out, typename In1, typename In2>
     PREONMATH_DEVICE static quat<Out> operator*(const quat<In1>& q, const quat<In2>& p)
     {
@@ -386,10 +386,5 @@ inline bool qFuzzyCompare(const Preon::Math::quat<Real>& q1, const Preon::Math::
 {
     return qFuzzyCompare(q1.x(), q2.x()) && qFuzzyCompare(q1.y(), q2.y()) && qFuzzyCompare(q1.z(), q2.z()) && qFuzzyCompare(q1.scalar(), q2.scalar());
 }
-
-Q_DECLARE_TYPEINFO(quatf, Q_MOVABLE_TYPE);
-Q_DECLARE_TYPEINFO(quatd, Q_MOVABLE_TYPE);
-Q_DECLARE_METATYPE(quatf)
-Q_DECLARE_METATYPE(quatd)
 
 #endif  // PREONMATH_QT_INTEGRATION

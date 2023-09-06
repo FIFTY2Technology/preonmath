@@ -11,7 +11,7 @@
 
 #ifdef PREONMATH_UNITS_INTEGRATION
     #include "core/utility/units_math_scalar.h"  // TODO: Including a file in "core" is not so nice and needs to be changed when releasing a new version of PreonMath.
-#endif
+#endif  // PREONMATH_UNITS_INTEGRATION
 
 namespace Preon
 {
@@ -25,7 +25,7 @@ namespace Math
         if constexpr (is_simd_scalar<Type>::value)
             return T(Simd::zero<typename Simd::Scalar<Type>::type>());
         else
-#endif
+#endif  // PREONMATH_ENABLE_SIMD
             return T(0);
     }
 }  // namespace Math

@@ -6,6 +6,7 @@
 
 #include "compile_helper.h"
 
+#include "euler_fwd.h"
 #include "vec.h"
 
 #ifdef PREONMATH_QT_INTEGRATION
@@ -68,10 +69,6 @@ namespace Math
         vec<3, T> m_Data;
     };
 
-    // define instanced types for compatibility reasons
-    using eulerf = euler<float>;
-    using eulerd = euler<double>;
-
     template<typename T>
     std::stringstream& operator<<(std::stringstream& stream, const euler<T>& val)
     {
@@ -115,8 +112,5 @@ inline bool qFuzzyCompare(const euler<T>& e1, const euler<T>& e2)
 {
     return qFuzzyCompare(e1.m_Data, e2.m_Data);
 }
-
-Q_DECLARE_METATYPE(eulerf)
-Q_DECLARE_METATYPE(eulerd)
 
 #endif  // PREONMATH_QT_INTEGRATION

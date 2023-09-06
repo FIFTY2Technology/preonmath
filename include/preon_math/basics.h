@@ -5,6 +5,7 @@
 #pragma once
 
 #include "compile_helper.h"
+#include "scalar_wrapper_std.h"
 
 #include <cmath>
 #include <cstring>
@@ -65,106 +66,106 @@ namespace Math
     // We do not define it generically,
     // because we want an error if it is called for a non-instantiated class.
     template<typename T>
-    inline bool IsZero(T val);
+    PREONMATH_DEVICE inline bool IsZero(T val);
     template<>
-    inline bool IsZero<float>(float val)
+    PREONMATH_DEVICE inline bool IsZero<float>(float val)
     {
-        return std::abs(val) < FEps;
+        return abs(val) < FEps;
     }
     template<>
-    inline bool IsZero<double>(double val)
+    constexpr inline bool IsZero<double>(double val)
     {
-        return std::abs(val) < DEps;
+        return abs(val) < DEps;
     }
     template<>
-    inline bool IsZero<int>(int val)
+    PREONMATH_DEVICE inline bool IsZero<int>(int val)
     {
         return val == 0;
     }
 
     // IsExactlyZero.
     template<typename T>
-    inline bool IsExactlyZero(T val);
+    PREONMATH_DEVICE inline bool IsExactlyZero(T val);
     template<>
-    inline bool IsExactlyZero<float>(float val)
+    PREONMATH_DEVICE inline bool IsExactlyZero<float>(float val)
     {
-        return std::abs(val) == 0.0f;
+        return abs(val) == 0.0f;
     }
     template<>
-    inline bool IsExactlyZero<double>(double val)
+    PREONMATH_DEVICE inline bool IsExactlyZero<double>(double val)
     {
-        return std::abs(val) == 0.0;
+        return abs(val) == 0.0;
     }
     template<>
-    inline bool IsExactlyZero<int>(int val)
+    PREONMATH_DEVICE inline bool IsExactlyZero<int>(int val)
     {
         return val == 0;
     }
 
     // AreEqual.
     template<typename T>
-    inline bool AreEqual(T a, T b)
+    PREONMATH_DEVICE inline bool AreEqual(T a, T b)
     {
         return IsZero<T>(a - b);
     }
 
     // AreExactlyEqual.
     template<typename T>
-    inline bool AreExactlyEqual(T a, T b)
+    PREONMATH_DEVICE inline bool AreExactlyEqual(T a, T b)
     {
         return IsExactlyZero<T>(a - b);
     }
 
     // Signum function.
     template<typename T>
-    inline int Signum(T val);
+    PREONMATH_DEVICE inline int Signum(T val);
     template<>
-    inline int Signum<float>(float val)
+    PREONMATH_DEVICE inline int Signum<float>(float val)
     {
         return (val > 0.0f) - (val < 0.0f);
     }
     template<>
-    inline int Signum<double>(double val)
+    PREONMATH_DEVICE inline int Signum<double>(double val)
     {
         return (val > 0.0) - (val < 0.0);
     }
     template<>
-    inline int Signum<int>(int val)
+    PREONMATH_DEVICE inline int Signum<int>(int val)
     {
         return (val > 0) - (val < 0);
     }
 
     // DegToRad.
     template<typename T>
-    inline T DegToRad(T val);
+    PREONMATH_DEVICE inline T DegToRad(T val);
     template<>
-    inline float DegToRad<float>(float degree)
+    PREONMATH_DEVICE inline float DegToRad<float>(float degree)
     {
         return FDegreeToRadians * degree;
     }
     template<>
-    inline double DegToRad<double>(double degree)
+    PREONMATH_DEVICE inline double DegToRad<double>(double degree)
     {
         return DDegreeToRadians * degree;
     }
 
     // RadToDeg.
     template<typename T>
-    inline T RadToDeg(T val);
+    PREONMATH_DEVICE inline T RadToDeg(T val);
     template<>
-    inline float RadToDeg<float>(float radians)
+    PREONMATH_DEVICE inline float RadToDeg<float>(float radians)
     {
         return FRadiansToDegree * radians;
     }
     template<>
-    inline double RadToDeg<double>(double radians)
+    PREONMATH_DEVICE inline double RadToDeg<double>(double radians)
     {
         return DRadiansToDegree * radians;
     }
 
     // Returns the value of the given argument as primitive type. Can be specialized for custom data types.
     template<typename T>
-    T PrimitiveType(const T& val)
+    PREONMATH_DEVICE T PrimitiveType(const T& val)
     {
         return val;
     }
@@ -192,7 +193,5 @@ namespace Math
     inline bool DAreExactlyEqual(double a, double b) { return AreExactlyEqual<double>(a, b); }
     inline double DDegToRad(double deg) { return DegToRad<double>(deg); }
     inline double DRadToDeg(double radians) { return RadToDeg<double>(radians); }
-
-    using preal = float;
 }  // namespace Math
 }  // namespace Preon

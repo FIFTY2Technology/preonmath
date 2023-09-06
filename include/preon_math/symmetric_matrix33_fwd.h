@@ -13,7 +13,7 @@ namespace Math
     template<typename T>
     class SymmetricMatrix33;
 
-    typedef SymmetricMatrix33<float> SymmetricMatrix33f;
-    typedef SymmetricMatrix33<double> SymmetricMatrix33d;
+    using SymmetricMatrix33f = SymmetricMatrix33<float>;
+    using SymmetricMatrix33d = SymmetricMatrix33<double>;
 }  // namespace Math
 }  // namespace Preon

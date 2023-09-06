@@ -6,8 +6,6 @@
 
 #include "compile_helper.h"
 
-#include <cstddef>  // For size_t
-
 namespace Preon
 {
 namespace Math
@@ -20,7 +18,7 @@ namespace Math
     using vec2 = vec<2, T>;
     using vec2f = vec2<float>;
     using vec2d = vec2<double>;
-    using vec2i = vec<2, int>;
+    using vec2i = vec2<int>;
 
     // Vec3.
     template<typename T>
@@ -28,6 +26,9 @@ namespace Math
     using vec3f = vec3<float>;
     using vec3d = vec3<double>;
     using vec3i = vec3<int>;
+    using vec3us = vec3<unsigned short>;
+    using vec3uc = vec3<unsigned char>;
+    using vec3ui = vec3<unsigned int>;
 
     // Vec4.
     template<typename T>

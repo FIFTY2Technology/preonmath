@@ -1,6 +1,7 @@
 set(test_src_files
         ${CMAKE_CURRENT_SOURCE_DIR}/test_math_utils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/test_vec2.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/catch_amalgamated.cpp
     )
 
 add_executable(preon_math_tests main.cpp ${test_src_files})

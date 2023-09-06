@@ -4,6 +4,7 @@
 
 # Build files.
 build/*
+.cache/*
 
 # Prerequisites
 *.d

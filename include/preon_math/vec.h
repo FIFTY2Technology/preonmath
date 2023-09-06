@@ -11,12 +11,17 @@
 #include "scalar_simd.h"
 #include "scalar_wrapper_std.h"
 #include "static_for.h"
+#include "vec_fwd.h"
 
 #ifdef PREONMATH_QT_INTEGRATION
     #include <QDataStream>
     #include <QDebug>
     #include <QString>
 #endif  // PREONMATH_QT_INTEGRATION
+
+#ifdef PREONMATH_UNITS_INTEGRATION
+    #include <units/core.h>
+#endif
 
 #include <array>
 #include <cassert>
@@ -343,7 +348,9 @@ namespace Math
         PREONMATH_DEVICE void normalize(enable_if_non_simd<E, void*> = nullptr)
         {
             T length = this->length();
+#ifndef PREONMATH_CUDA
             THROW_EXCEPTION(IsZero(length), std::domain_error("Normalizing a zero vector is undefined"))
+#endif
             (*this) /= length;
         }
 
@@ -419,42 +426,36 @@ namespace Math
         }
 
         template<typename U = T, typename V = T>
-        PREONMATH_DEVICE vec<D, U> elementWiseMultiplication(const vec<D, V>& factor) const
+        PREONMATH_DEVICE vec<D, product_t<U, V>> elementWiseMultiplication(const vec<D, V>& factor) const
         {
-            return vec<D, U>([&](PrMathSize d) { return (*this)[d] * factor[d]; });
+            return vec<D, product_t<U, V>>([&](PrMathSize d) { return (*this)[d] * factor[d]; });
         }
 
         template<typename U = T, typename V = T>
-        PREONMATH_DEVICE vec<D, U> elementWiseDivision(const vec<D, V>& divisor) const
+        PREONMATH_DEVICE vec<D, quotient_t<U, V>> elementWiseDivision(const vec<D, V>& divisor) const
         {
-            return vec<D, U>([&](PrMathSize d) { return (*this)[d] / divisor[d]; });
+            return vec<D, quotient_t<U, V>>([&](PrMathSize d) { return (*this)[d] / divisor[d]; });
         }
 
-        template<typename T_Vec1, typename T_Vec2>
-        static PREONMATH_FORCEINLINE product_t<T_Vec1, T_Vec2> dotProduct(const vec<D, T_Vec1>& v1, const vec<D, T_Vec2>& v2)
+        template<typename T2>
+        static PREONMATH_FORCEINLINE product_t<T, T2> dotProduct(const vec<D, T>& v1, const vec<D, T2>& v2)
         {
-            product_t<T_Vec1, T_Vec2> out = v1[0] * v2[0];
-            StaticFor<1, D>([&](PrMathSize d) { out = out + product_t<T_Vec1, T_Vec2>(v1[d] * v2[d]); });
+            product_t<T, T2> out = v1[0] * v2[0];
+            StaticFor<1, D>([&](PrMathSize d) { out = out + product_t<T, T2>(v1[d] * v2[d]); });
             return out;
         }
 
         static PREONMATH_FORCEINLINE product_t<T, T> dotProduct(const vec<D, T>& v1, const vec<D, T>& v2)
         {
-            return dotProduct<T, T>(v1, v2);
+            return dotProduct<T>(v1, v2);
         }
 
         /** Cross product **/
 
-        template<PrMathSize E = D>
-        static PREONMATH_DEVICE typename std::enable_if<E == 3, vec<D, T>>::type crossProduct(const vec<D, T>& v1, const vec<D, T>& v2)
+        template<typename T2, PrMathSize E = D>
+        static PREONMATH_DEVICE typename std::enable_if<E == 3, vec<D, product_t<T, T2>>>::type crossProduct(const vec<D, T>& v1, const vec<D, T2>& v2)
         {
-            return crossProduct<T, T, D>(v1, v2);
-        }
-
-        template<typename Out, typename In, PrMathSize E = D>
-        static PREONMATH_DEVICE typename std::enable_if<E == 3, vec<D, T>>::type crossProduct(const vec<D, T>& v1, const vec<D, In>& v2)
-        {
-            return vec<D, Out>(v1.y() * v2.z() - v1.z() * v2.y(), v1.z() * v2.x() - v1.x() * v2.z(), v1.x() * v2.y() - v1.y() * v2.x());
+            return vec<D, product_t<T, T2>>(v1.y() * v2.z() - v1.z() * v2.y(), v1.z() * v2.x() - v1.x() * v2.z(), v1.x() * v2.y() - v1.y() * v2.x());
         }
 
         /** Orthogonal direction **/
@@ -614,6 +615,21 @@ namespace Math
         }
 #endif  // PREONMATH_QT_INTEGRATION
 
+#ifdef PREONMATH_UNITS_INTEGRATION
+        // conversion between vec<D, T> and vec<D, units::dimensionless<T>> (for T being a unitless type)
+        template<typename _T = T, typename = enable_if_scalar<_T>>
+        PREONMATH_DEVICE vec(const vec<D, units::dimensionless<T>>& v)
+            : vec([&](PrMathSize i) { return v[i]; })
+        {
+        }
+
+        template<typename _T = T, typename = enable_if_scalar<_T>>
+        PREONMATH_DEVICE operator vec<D, units::dimensionless<T>>() const
+        {
+            return vec<D, units::dimensionless<T>>([&](PrMathSize i) { return (*this)[i]; });
+        }
+#endif
+
     private:
         std::array<T, D> m_Data;
     };
@@ -674,13 +690,15 @@ namespace Math
     template<PrMathSize D, typename T_Vec1, typename T_Vec2>
     PREONMATH_DEVICE product_t<T_Vec1, T_Vec2> operator*(const vec<D, T_Vec1>& v1, const vec<D, T_Vec2>& v2)
     {
-        return vec<D, product_t<T_Vec1, T_Vec2>>::template dotProduct<T_Vec1, T_Vec2>(v1, v2);
+        return vec<D, T_Vec1>::dotProduct(v1, v2);
     }
 
     template<PrMathSize D, typename T>
     PREONMATH_DEVICE product_t<T, T> operator*(const vec<D, T>& v1, const vec<D, T>& v2)
     {
-        return operator*<D, T, T>(v1, v2);
+        // TODO: this does not work in CUDA!
+        // return operator*<D, T, T>(v1, v2);
+        return vec<D, T>::dotProduct(v1, v2);
     }
 
     template<PrMathSize D, typename T>

@@ -11,7 +11,6 @@
     #include "vec.h"
     #include "scalar_simd.h"
     #include "vec.h"
-    #include "vec3.h"
     #include "static_for.h"
 
     #ifdef PREONMATH_COMPILER_MSVC

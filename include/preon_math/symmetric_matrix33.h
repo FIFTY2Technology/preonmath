@@ -7,6 +7,7 @@
 #include "compile_helper.h"
 #include "vec.h"
 #include "matrix.h"
+#include "symmetric_matrix33_fwd.h"
 
 #include <sstream>
 #include <iostream>
@@ -127,15 +128,5 @@ namespace Math
         ss << symmetricMatrix;
         return ostream << ss.rdbuf();
     }
-
-    typedef SymmetricMatrix33<float> SymmetricMatrix33f;
-    typedef SymmetricMatrix33<double> SymmetricMatrix33d;
 }  // namespace Math
 }  // namespace Preon
-
-#ifdef PREONMATH_QT_INTEGRATION
-Q_DECLARE_TYPEINFO(SymmetricMatrix33f, Q_MOVABLE_TYPE);
-Q_DECLARE_TYPEINFO(SymmetricMatrix33d, Q_MOVABLE_TYPE);
-Q_DECLARE_METATYPE(SymmetricMatrix33f)
-Q_DECLARE_METATYPE(SymmetricMatrix33d)
-#endif  // PREONMATH_QT_INTEGRATION

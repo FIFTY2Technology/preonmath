@@ -7,9 +7,6 @@
 #include "compile_helper.h"
 
 #ifdef PREONMATH_ENABLE_SIMD
-
-    #include "basics.h"
-
     #ifdef PREONMATH_COMPILER_MSVC
         #include <intrin.h>
     #else  // GCC and Clang

@@ -6,11 +6,16 @@
 
 #include "compile_helper.h"
 
+#include "matrix_fwd.h"
 #include "vec.h"
 
 #include <type_traits>
 #include <sstream>
 #include <iostream>
+
+#ifdef PREONMATH_UNITS_INTEGRATION
+    #include <units/core.h>
+#endif
 
 namespace Preon
 {
@@ -68,6 +73,12 @@ namespace Math
         PREONMATH_DEVICE T element(PrMathSize row, PrMathSize column) const { return m_Data[column][row]; }
         PREONMATH_DEVICE T& element(PrMathSize row, PrMathSize column) { return m_Data[column][row]; }
 
+        //! Calls the "value" member function on each element.
+        PREONMATH_DEVICE auto value() const
+        {
+            return matrix<M, N, decltype(std::declval<T>().value())>([this](PrMathSize r, PrMathSize c) { return element(r, c).value(); });
+        }
+
         // Filling
         PREONMATH_DEVICE inline void fill(T value);
         PREONMATH_DEVICE inline void setToZero() { fill(scalar_zero<T>()); }
@@ -118,8 +129,11 @@ namespace Math
         }
 
         // Reductions
-        template<typename E = T>
-        PREONMATH_DEVICE inline enable_if_non_simd<E, E> norm(E p = 2) const;
+
+        // Only the 2-norm is implemented.
+        // It is p-norm of the vector with M ⋅ N entries corresponding to the matrix, for the special case p = 2.
+        // It also coincides with the Frobenius norm of the matrix.
+        PREONMATH_DEVICE inline T norm() const;
 
         template<PrMathSize _M = M, PrMathSize _N = N>
         PREONMATH_DEVICE inline T determinant(typename std::enable_if<_M == _N && _M != 2 && _M != 3, T>::type* = nullptr) const;
@@ -158,12 +172,27 @@ namespace Math
         }
 #endif  // PREONMATH_QT_INTEGRATION
 
+#ifdef PREONMATH_UNITS_INTEGRATION
+        // conversion between matrix<M, N, T> and matrix<M, N, units::dimensionless<T>> (for T being a unitless type)
+        template<typename _T = T, typename = enable_if_scalar<_T>>
+        PREONMATH_DEVICE matrix(const matrix<M, N, units::dimensionless<T>>& v)
+            : matrix([&](PrMathSize r, PrMathSize c) { return v(r, c); })
+        {
+        }
+
+        template<typename _T = T, typename = enable_if_scalar<_T>>
+        PREONMATH_DEVICE operator matrix<M, N, units::dimensionless<T>>() const
+        {
+            return matrix<M, N, units::dimensionless<T>>([&](PrMathSize r, PrMathSize c) { return (*this)(r, c); });
+        }
+#endif
+
     private:
         std::array<vec<M, T>, N> m_Data;  // Column-major order to match OpenGL.
 
         // This constructor is private, as the size of the initializer list cannot
         // be checked at compile time, which may lead to unintuitive behavior.
-        matrix(const std::initializer_list<T>& values);
+        PREONMATH_DEVICE matrix(const std::initializer_list<T>& values);
 
         template<typename E>
         PREONMATH_DEVICE void legacyInitZeroFunc(enable_if_non_simd<E, void*> = nullptr)
@@ -218,13 +247,13 @@ namespace Math
 
     template<PrMathSize M, PrMathSize N, PrMathSize O, typename T>
     PREONMATH_DEVICE inline matrix<M, O, T> operator*(const matrix<M, N, T>& m1, const matrix<N, O, T>& m2);
-    template<PrMathSize M, PrMathSize N, typename T>
-    PREONMATH_DEVICE inline matrix<M, N, T> operator*(const T factor, matrix<M, N, T> m)
+    template<PrMathSize M, PrMathSize N, typename T1, typename T2>
+    PREONMATH_DEVICE inline matrix<M, N, product_t<T1, T2>> operator*(const T1 factor, const matrix<M, N, T2>& m)
     {
-        return m *= factor;
+        return matrix<M, N, product_t<T1, T2>>([&](PrMathSize r, PrMathSize c) { return factor * m(r, c); });
     }
-    template<PrMathSize M, PrMathSize N, typename T>
-    PREONMATH_DEVICE inline matrix<M, N, T> operator*(matrix<M, N, T> m, const T factor)
+    template<PrMathSize M, PrMathSize N, typename T1, typename T2>
+    PREONMATH_DEVICE inline matrix<M, N, product_t<T1, T2>> operator*(matrix<M, N, T1> m, const T2 factor)
     {
         return factor * m;
     }

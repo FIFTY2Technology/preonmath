@@ -12,7 +12,7 @@ namespace Math
 {
     template<typename Real>
     class quat;
-    typedef quat<float> quatf;
-    typedef quat<double> quatd;
+    using quatf = quat<float>;
+    using quatd = quat<double>;
 }  // namespace Math
 }  // namespace Preon

@@ -7,10 +7,8 @@
 #include "compile_helper.h"
 
 #include "vec.h"
-#include "vec3.h"
 #include "quat.h"
 #include "matrix.h"
-#include "matrix33.h"
 #include "euler.h"
 #include "scalar_simd.h"
 

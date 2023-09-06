@@ -7,7 +7,6 @@
 #include "compile_helper.h"
 
 #include "vec.h"
-#include "vec3.h"
 #include "matrix.h"
 
 #include "ImathVec.h"

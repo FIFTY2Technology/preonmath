@@ -7,7 +7,7 @@
 #include "compile_helper.h"
 #include "basics.h"
 
-#include "vec3.h"
+#include "vec.h"
 
 namespace Preon
 {
@@ -16,7 +16,7 @@ namespace Math
     struct MathMisc
     {
         template<typename scalar>
-        static scalar rayPlaneIntersection(const vec<3, scalar>& rayOrigin, const vec<3, scalar>& rayDir, const vec<3, scalar>& planeNormal, const vec<3, scalar>& planePos)
+        PREONMATH_DEVICE static scalar rayPlaneIntersection(const vec<3, scalar>& rayOrigin, const vec<3, scalar>& rayDir, const vec<3, scalar>& planeNormal, const vec<3, scalar>& planePos)
         {
             scalar denom = vec<3, scalar>::dotProduct(rayDir, planeNormal);
             if (std::abs(denom) <= Math::PreonReal<scalar>::eps())
@@ -25,7 +25,7 @@ namespace Math
         }
 
         template<typename scalar>
-        static vec<3, scalar> projectPointOnLine(const vec<3, scalar>& p, const vec<3, scalar>& line1, const vec<3, scalar>& line2, scalar& t)
+        PREONMATH_DEVICE static vec<3, scalar> projectPointOnLine(const vec<3, scalar>& p, const vec<3, scalar>& line1, const vec<3, scalar>& line2, scalar& t)
         {
             vec<3, scalar> rayDir = line2 - line1;
             t = rayPlaneIntersection(line1, rayDir, rayDir, p);
@@ -147,7 +147,7 @@ namespace Math
         }
 
         template<class T>
-        static T square(const T& val)
+        PREONMATH_DEVICE static product_t<T, T> square(const T& val)
         {
             return val * val;
         }

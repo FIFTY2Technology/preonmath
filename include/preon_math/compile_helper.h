@@ -4,7 +4,7 @@
 
 #pragma once
 
-#ifdef __NVCC__
+#ifdef __CUDACC__
     #define PREONMATH_CUDA
 #endif
 
@@ -21,6 +21,7 @@
 
 namespace Preon::Math
 {
+using preal = float;
 using PrMathSize = int;
 }  // namespace Preon::Math
 
@@ -36,13 +37,17 @@ using namespace Preon::Math;
 
 #endif  // PREONMATH_USED_IN_PREON_CODE
 #ifndef THROW_EXCEPTION
-    #define THROW_EXCEPTION(condition, exception) \
-        {                                         \
-            if (condition)                        \
-            {                                     \
-                throw exception;                  \
-            }                                     \
-        }
+    #ifndef PREONMATH_CUDA
+        #define THROW_EXCEPTION(condition, exception) \
+            {                                         \
+                if (condition)                        \
+                {                                     \
+                    throw exception;                  \
+                }                                     \
+            }
+    #else
+        #define THROW_EXCEPTION(condition, exception)
+    #endif
 #endif  // THROW_EXCEPTION
 
 // Define macros for identifying msvc compiler.
@@ -53,7 +58,7 @@ using namespace Preon::Math;
 
 #ifndef PREONMATH_FORCEINLINE
     #ifdef PREONMATH_CUDA
-        #define PREONMATH_FORCEINLINE __host__ __device__
+        #define PREONMATH_FORCEINLINE __host__ __device__ inline
     #elif defined(PREONMATH_COMPILER_MSVC)
         #define PREONMATH_FORCEINLINE __forceinline
     #else

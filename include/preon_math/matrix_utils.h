@@ -7,7 +7,6 @@
 #include "compile_helper.h"
 
 #include "matrix.h"
-#include "matrix33.h"
 #include "vec_simd.h"
 #include "quat.h"
 
@@ -17,6 +16,13 @@ namespace Math
 {
     namespace MatrixUtils
     {
+        // Creates a diagonal matrix from a vector of the same size.
+        template<PrMathSize D, typename T>
+        PREONMATH_FORCEINLINE matrix<D, D, T> makeDiagonal(const vec<D, T>& v)
+        {
+            return matrix<D, D, T>([&v](PrMathSize r, PrMathSize c) { return r == c ? v[r] : T(0); });
+        }
+
         //! Creates a matrix that ---used as matrix-vector multiplication---
         //! expresses the a cross product.
         //! See: https://en.wikipedia.org/wiki/Cross_product#Conversion_to_matrix_multiplication
@@ -397,6 +403,22 @@ namespace Math
             m.transpose();
 
             return m;
+        }
+
+        // Typically, the Frobenius inner product is defined also for matrices with complex entries.
+        // This implementation is only for matrices with real entries.
+        // For matrices with complex entries, one of both factors would need to be conjugated.
+        // https://en.wikipedia.org/wiki/Frobenius_inner_product
+        template<typename Scalar>
+        PREONMATH_DEVICE Scalar frobeniusInnerProduct(const matrix<3, 3, Scalar>& a, const matrix<3, 3, Scalar>& b)
+        {
+            Scalar innerProd(0.0);
+            for (PrMathSize i = 0; i <= 2; i++)
+            {
+                for (PrMathSize j = 0; j <= 2; j++)
+                    innerProd += a.element(i, j) * b.element(i, j);
+            }
+            return innerProd;
         }
 
 #ifdef PREONMATH_ENABLE_SIMD

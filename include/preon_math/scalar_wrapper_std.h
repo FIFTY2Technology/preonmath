@@ -22,24 +22,20 @@ namespace Math
         return ::sqrt(val);
     }
     template<typename T>
-    PREONMATH_DEVICE T abs(T val)
+    constexpr T abs(T val)
     {
         return ::abs(val);
     }
     template<typename T>
-    PREONMATH_DEVICE T min(T val)
+    PREONMATH_DEVICE T isnan(T val)
     {
-        return ::min(val);
-    }
-    template<typename T>
-    PREONMATH_DEVICE T max(T val)
-    {
-        return ::max(val);
+        return ::isnan(val);
     }
 #else
-#ifdef PREONMATH_ENABLE_SIMD
+    #ifdef PREONMATH_ENABLE_SIMD
     using Simd::sqrt;
-#endif // PREONMATH_ENABLE_SIMD
+    #endif  // PREONMATH_ENABLE_SIMD
+    using std::isnan;
     using std::max;
     using std::min;
     using std::sqrt;
